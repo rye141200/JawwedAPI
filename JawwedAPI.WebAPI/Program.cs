@@ -1,3 +1,4 @@
+using JawwedAPI.Core.Helpers;
 using JawwedAPI.WebAPI.Extensions;
 
 namespace JawwedAPI.WebAPI;
@@ -8,7 +9,9 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllers();
         builder.Services.AddConnection(builder.Configuration).AddRepository().AddAutoMapper().AddSeedService();
-        
+        builder.Services.AddServices(builder.Configuration);
+
+
         var app = builder.Build();
 
         app.UseStaticFiles();

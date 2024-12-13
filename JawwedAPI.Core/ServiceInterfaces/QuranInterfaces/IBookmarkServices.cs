@@ -1,5 +1,5 @@
 using JawwedAPI.Core.DTOs;
-namespace  JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
+namespace JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 /// <summary>
 /// Provides services for managing bookmarks from get all bookmarks, update some and delete.
 /// </summary>
@@ -15,12 +15,12 @@ public interface IBookmarkServices
     /// Adds a new bookmark.
     /// </summary>
     /// <param name="bookmark">The bookmarkAddRequest object.</param>
-    Task AddBookmark(BookmarkAddRequest bookmarkAddRequest);
+    Task<BookmarkResponse?> AddBookmark(BookmarkAddRequest bookmarkAddRequest);
     /// <summary>
     /// delete a specific bookmark from database
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="verseKey"></param>
     /// <returns></returns>
-    Task DeleteBookmark(int userId, string verseKey);
+    Task<bool> DeleteBookmark(int userId, string verseKey);
 }

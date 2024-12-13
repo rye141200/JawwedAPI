@@ -6,4 +6,5 @@ public interface IGenericRepositoryMapped<T, M> where T : class where M : class
 {
     Task<M?> FindOneMapped(Expression<Func<T, bool>> predicate);
     Task<IEnumerable<M>> GetAllMapped();
+    Task<IEnumerable<M>> Find(Expression<Func<T, bool>> predicate);
 }

@@ -4,6 +4,9 @@ using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Infrastructure.Repositories;
 using JawwedAPI.Infrastructure.DataSeeding;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
+using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
+using JawwedAPI.Core.Services;
+using JawwedAPI.Core.Options;
 
 namespace JawwedAPI.WebAPI.Extensions;
 
@@ -15,7 +18,7 @@ public static class AppServicesExtensions
     {
         service.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseSqlServer(config.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("DAL"));
+            options.UseSqlServer(config.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("JawwedAPI.Infrastructure"));
         });
         return service;
     }
@@ -39,5 +42,12 @@ public static class AppServicesExtensions
         services.AddScoped(typeof(IGenericSeedService<,>), typeof(GenericSeedService<,>));
         return services;
     }
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddScoped<IBookmarkServices, BookmarkServices>();
+        services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
+        return services;
+    }
+
 
 }

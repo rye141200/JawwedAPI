@@ -19,4 +19,6 @@ public class Bookmark
     public string? Verse { get; set; }
     public string? Page { get; set; }
 
+    //! navigational property
+
 }

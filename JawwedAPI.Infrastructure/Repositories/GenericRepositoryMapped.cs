@@ -8,6 +8,7 @@ namespace JawwedAPI.Infrastructure.Repositories;
 
 public class GenericRepositoryMapped<T, M>(ApplicationDbContext context, IMapper mapper) : IGenericRepositoryMapped<T, M> where T : class where M : class
 {
+
     public async Task<M?> FindOneMapped(Expression<Func<T, bool>> predicate)
     => await context.Set<T>().
         Where(predicate).
@@ -17,4 +18,13 @@ public class GenericRepositoryMapped<T, M>(ApplicationDbContext context, IMapper
     => await context.Set<T>().
     ProjectTo<M>(mapper.ConfigurationProvider).
     ToListAsync();
+    public async Task<IEnumerable<M>> Find(Expression<Func<T, bool>> predicate)
+    {
+        var entities = await context.Set<T>()
+            .Where(predicate)
+            .ToListAsync();
+
+        return mapper.Map<IEnumerable<M>>(entities);
+    }
+
 }
