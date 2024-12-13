@@ -14,7 +14,6 @@ public class BookmarkAddRequest
     [Required]
     public string Page { get; set; } = null!;
 
-
 }
 
 
