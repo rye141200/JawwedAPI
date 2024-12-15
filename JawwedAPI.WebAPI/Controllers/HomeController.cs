@@ -8,7 +8,9 @@ namespace JawwedAPI.WebAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 //IGenericSeedService<JsonLine, Line> seed
-public class HomeController(IGenericProcedureRepository<Line, LineWithVerseDTO> repository, IGenericRepository<Line> linesRepository) : ControllerBase
+public class HomeController(IGenericProcedureRepository<Line, LineWithVerseDTO> repository,
+IGenericRepository<Line> linesRepository,
+IGenericRepositoryMapped<Line, LineResponse> lineRepoMapped) : ControllerBase
 {
     [HttpGet("/api/home/{page}")]
     public async Task<IActionResult> Index([FromRoute] int page)
@@ -86,7 +88,7 @@ public class HomeController(IGenericProcedureRepository<Line, LineWithVerseDTO> 
     [HttpGet("/api/mushaf/lines/{page:int}")]
     public async Task<IActionResult> GetPage([FromRoute] int page)
     {
-        return Ok(await linesRepository.Find(line => line.PageNumber == page));
+        return Ok(await lineRepoMapped.Find(line => line.PageNumber == page));
     }
 }
 

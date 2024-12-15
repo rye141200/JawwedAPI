@@ -11,10 +11,12 @@ public static class AppExtensions
     {
         using (var scope = app.Services.CreateScope())
         {
-            var chapterSeedService = scope.ServiceProvider.GetRequiredService<IGenericSeedService<JsonChapter, Chapter>>();
-            var lineSeedService = scope.ServiceProvider.GetRequiredService<IGenericSeedService<JsonLine, Line>>();
-            await chapterSeedService.SaveToDatabase(@"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\chaptersInfo.json");
-            await lineSeedService.SaveToDatabase(@"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\linesPopulatedUthmani.json");
+            //var chapterSeedService = scope.ServiceProvider.GetRequiredService<IGenericSeedService<JsonChapter, Chapter>>();
+            //var lineSeedService = scope.ServiceProvider.GetRequiredService<IGenericSeedService<JsonLine, Line>>();
+            //await chapterSeedService.SaveToDatabase(@"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\chaptersInfo.json");
+            //await lineSeedService.SaveToDatabase(@"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\linesPopulatedUthmani.json");
+            var verseSeedService = scope.ServiceProvider.GetRequiredService<IGenericSeedService<JsonVerse, Verse>>();
+            await verseSeedService.SaveToDatabase(@"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\versesFlattenedPerPage.json");
         }
     }
 }

@@ -44,7 +44,7 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasKey("BookmarkId");
 
-                    b.ToTable("Bookmarks");
+                    b.ToTable("Bookmarks", (string)null);
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Chapter", b =>
@@ -80,7 +80,7 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasKey("ChapterID");
 
-                    b.ToTable("Chapters");
+                    b.ToTable("Chapters", (string)null);
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Line", b =>
@@ -116,7 +116,7 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasKey("LineID");
 
-                    b.ToTable("Lines");
+                    b.ToTable("Lines", (string)null);
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Verse", b =>
@@ -156,7 +156,7 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasIndex("LineID");
 
-                    b.ToTable("Verses");
+                    b.ToTable("Verses", (string)null);
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Verse", b =>

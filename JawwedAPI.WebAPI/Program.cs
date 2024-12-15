@@ -21,7 +21,11 @@ public class Program
         app.UseStaticFiles();
         app.UseRouting();
         app.MapControllers();
-        // app.MapGet("/", (HttpContext context) => );
+        app.MapGet("/", async (HttpContext context) =>
+        {
+            await app.SeedData();
+        });
+
 
         app.Run();
     }

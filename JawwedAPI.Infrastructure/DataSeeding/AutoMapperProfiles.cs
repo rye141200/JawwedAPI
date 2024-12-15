@@ -9,21 +9,23 @@ public class AutoMapperProfiles : Profile
 {
     public AutoMapperProfiles()
     {
-        // CreateMap<AppUser, MemberDto>().
-        // ForMember(memberDto => memberDto.Age,
-        // options => options.MapFrom(appUser => appUser.DateOfBirth.CalculateAge())
-        // ).
-        // ForMember(memberDto => memberDto.PhotoUrl, options => options.MapFrom(
-        //     appUser =>
-        //     appUser.Photos.FirstOrDefault(photo => photo.IsMain)!.Url
-        //     )
-        // );
-        // CreateMap<Photo, PhotoDto>();
         CreateMap<BookmarkAddRequest, Bookmark>();
         CreateMap<Bookmark, BookmarkResponse>()
         .ForMember(dest => dest.Audios, options => options.MapFrom<BookMarkResponseResolver>()
         );
+
+        CreateMap<Line, LineResponse>().
+        ForMember(lineResponse => lineResponse.JuzNumber,
+        options => options.MapFrom(line => Math.Ceiling(line.PageNumber / 20.0) == 31 ? 30 :
+        Math.Ceiling(line.PageNumber / 20.0))).
+        ForMember(lineResponse => lineResponse.HizbNumber,
+        options => options.MapFrom(line => Math.Ceiling(line.PageNumber / 10.0))).
+        ForMember(lineResponse => lineResponse.RubHizbNumber,
+        options => options.MapFrom(line => Math.Ceiling((line.PageNumber % 10) / 2.5)));
+
+
         CreateMap<JsonChapter, Chapter>();
         CreateMap<JsonLine, Line>();
+        CreateMap<JsonVerse, Verse>();
     }
 }
