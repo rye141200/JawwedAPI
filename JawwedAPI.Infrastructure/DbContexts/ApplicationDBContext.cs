@@ -1,4 +1,6 @@
 using JawwedAPI.Core.Domain.Entities;
+using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
+using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
 using Microsoft.EntityFrameworkCore;
 
 namespace JawwedAPI.Infrastructure.DbContexts;
