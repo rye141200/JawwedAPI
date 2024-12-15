@@ -1,4 +1,5 @@
 using JawwedAPI.Core.Helpers;
+using JawwedAPI.Infrastructure.DbContexts;
 using JawwedAPI.WebAPI.Extensions;
 
 namespace JawwedAPI.WebAPI;
@@ -8,7 +9,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllers();
-        builder.Services.AddConnection(builder.Configuration).AddRepository().AddAutoMapper().AddSeedService();
+        builder.Services.AddSeedService().AddConnection(builder.Configuration).AddRepository().AddAutoMapper();
         builder.Services.AddServices(builder.Configuration);
 
 
@@ -17,6 +18,7 @@ public class Program
         app.UseStaticFiles();
         app.UseRouting();
         app.MapControllers();
+        // app.SeedData();
         // app.MapGet("/", (HttpContext context) => );
 
         app.Run();

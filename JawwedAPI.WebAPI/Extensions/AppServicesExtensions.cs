@@ -7,6 +7,8 @@ using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.Services;
 using JawwedAPI.Core.Options;
+using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
+using JawwedAPI.Core.Domain.Entities;
 
 namespace JawwedAPI.WebAPI.Extensions;
 
@@ -48,6 +50,4 @@ public static class AppServicesExtensions
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
         return services;
     }
-
-
 }
