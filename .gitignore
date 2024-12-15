@@ -44,3 +44,4 @@ msbuild.wrn
 JawwedAPI.WebAPI/Properties/PublishProfiles/jawwed-001-site1 - FTP.pubxml
 JawwedAPI.WebAPI/Properties/PublishProfiles/jawwed-001-site1 - Web Deploy.pubxml
 JawwedAPI.WebAPI/Properties/PublishProfiles/site14496-WebDeploy.pubxml
+JawwedAPI.WebAPI/Properties/PublishProfiles/site14496-WebDeploy1.pubxml
