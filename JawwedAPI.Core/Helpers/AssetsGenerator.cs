@@ -1,7 +1,9 @@
 
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using JawwedAPI.Core.Options;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace JawwedAPI.Core.Helpers;
 
@@ -31,7 +33,7 @@ public static class AssetsGenerator
         {
             string placeholder = matches[i].Value;
             T parameterValue = predicates[i]();
-            template = template.Replace(placeholder, parameterValue.ToString());
+            template = template.Replace(placeholder, parameterValue?.ToString());
         }
         return template;
     }
@@ -66,7 +68,6 @@ public static class AssetsGenerator
         }
         //! 3) add pieces together
         string templatePath = string.Join('/', templateParts);
-        //? return {baseLink}/{parameter1}/{parameter2}/{parameter3}
         return template += templatePath;
     }
 

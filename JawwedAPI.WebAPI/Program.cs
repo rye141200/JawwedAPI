@@ -13,11 +13,14 @@ public class Program
 
 
         var app = builder.Build();
-
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler(_ => { });
+        }
         app.UseStaticFiles();
         app.UseRouting();
         app.MapControllers();
-        // app.MapGet("/", (HttpContext context) => );
+
 
         app.Run();
     }

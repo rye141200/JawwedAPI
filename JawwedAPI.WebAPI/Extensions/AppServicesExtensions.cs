@@ -7,6 +7,7 @@ using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.Services;
 using JawwedAPI.Core.Options;
+using JawwedAPI.Core.Exceptions;
 
 namespace JawwedAPI.WebAPI.Extensions;
 
@@ -46,6 +47,7 @@ public static class AppServicesExtensions
     {
         services.AddScoped<IBookmarkServices, BookmarkServices>();
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
+        services.AddExceptionHandler<GlobalErrorHandler>();
         return services;
     }
 
