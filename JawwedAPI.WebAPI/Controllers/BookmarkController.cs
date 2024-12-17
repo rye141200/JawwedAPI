@@ -14,18 +14,14 @@ public class BookmarkController(IBookmarkServices bookmarkService) : ControllerB
     public async Task<IActionResult> AddBookmark(BookmarkAddRequest bookmarkAddRequest)
     {
         BookmarkResponse? bookmark = await bookmarkService.AddBookmark(bookmarkAddRequest);
-        if (bookmark is null) return Conflict("This bookmark already exists.");
         return Ok(bookmark);
     }
     [HttpDelete]
     public async Task<IActionResult> DeleteBookmark(int userId, string verseKey)
     {
 
-        bool status = await bookmarkService.DeleteBookmark(userId, verseKey);
-        if (status)
-            //todo change to deleted status code
-            return Ok();
-        return NotFound();
+        await bookmarkService.DeleteBookmark(userId, verseKey);
+        return Ok();
     }
     public async Task<IActionResult> GetBookmarks(int userId)
     {
