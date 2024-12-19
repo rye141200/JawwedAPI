@@ -23,6 +23,7 @@ public class BookmarkController(IBookmarkServices bookmarkService) : ControllerB
         await bookmarkService.DeleteBookmark(userId, verseKey);
         return Ok();
     }
+    [HttpGet]
     public async Task<IActionResult> GetBookmarks(int userId)
     {
         return Ok(await bookmarkService.GetAllBookmarks(userId));

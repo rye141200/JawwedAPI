@@ -4,6 +4,7 @@ using JawwedAPI.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JawwedAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241219214104_JuzHizbAndRubHizbMigration")]
+    partial class JuzHizbAndRubHizbMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,13 +94,13 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LineID"));
 
-                    b.Property<int?>("HizbNumber")
+                    b.Property<int>("HizbNumber")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsCentered")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("JuzNumber")
+                    b.Property<int>("JuzNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("LineNumber")
@@ -110,7 +113,7 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<int>("PageNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RubHizbNumber")
+                    b.Property<int>("RubHizbNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("SurahNumber")

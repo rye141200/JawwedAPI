@@ -13,16 +13,15 @@ public class LineResponse
 
     public int PageNumber { get; set; }
 
-
     public string? Text { get; set; }
 
     public bool IsCentered { get; set; }
 
     public List<VerseKeyAudio> VersesKeys { get; set; } = [];
 
-    public int JuzNumber { get; set; }
-    public int HizbNumber { get; set; }
-    public int RubHizbNumber { get; set; }
+    public int? JuzNumber { get; set; }
+    public int? HizbNumber { get; set; }
+    public int? RubHizbNumber { get; set; }
 }
 
 public class VerseKeyAudio

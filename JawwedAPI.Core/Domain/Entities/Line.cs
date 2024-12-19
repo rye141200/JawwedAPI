@@ -24,9 +24,13 @@ public class Line
     public bool IsCentered { get; set; }
 
 
+    public int? JuzNumber { get; set; }
+
+    public int? HizbNumber { get; set; }
+
+    public int? RubHizbNumber { get; set; }
+
     public string? VersesKeys { get; set; }
-
-
     //! Navigation fields
     public List<Verse>? Verses { get; set; }
 

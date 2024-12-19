@@ -30,8 +30,6 @@ public static class AppServicesExtensions
     {
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped(typeof(IGenericRepositoryMapped<,>), typeof(GenericRepositoryMapped<,>));
-        services.AddScoped(typeof(IGenericProcedureRepository<,>), typeof(GenericProcedureRepository<,>));
-
         return services;
     }
     public static IServiceCollection AddAutoMapper(this IServiceCollection services)

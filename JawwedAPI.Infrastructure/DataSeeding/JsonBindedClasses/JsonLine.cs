@@ -26,4 +26,13 @@ public class JsonLine
 
     [JsonPropertyName("verse_keys")]
     public string? VersesKeys { get; set; }
+
+    [JsonPropertyName("juz_number")]
+    public int JuzNumber { get; set; }
+
+    [JsonPropertyName("hizb_number")]
+    public int HizbNumber { get; set; }
+
+    [JsonPropertyName("rub_el_hizb_number")]
+    public int RubHizbNumber { get; set; }
 }

@@ -1,0 +1,36 @@
+@host = http://localhost:5260
+
+### Get Mushaf Page
+# @name getPage
+GET {{host}}/api/Mushaf/pages/1
+Accept: application/json
+
+### Get Specific Verse
+# @name getVerse
+GET {{host}}/api/Mushaf/chapters/1/verses/1
+Accept: application/json
+
+### Get All Verses in Chapter
+# @name getVerses
+GET {{host}}/api/Mushaf/chapters/1/verses
+Accept: application/json
+
+### Get Chapter Metadata
+# @name getChapterInfo
+GET {{host}}/api/Mushaf/chapters/1
+Accept: application/json
+
+### Invalid Page Number Test
+# @name invalidPage
+GET {{host}}/api/Mushaf/pages/605
+Accept: application/json
+
+### Invalid Chapter Number Test
+# @name invalidChapter
+GET {{host}}/api/Mushaf/chapters/115/verses
+Accept: application/json
+
+### Invalid Verse Number Test
+# @name invalidVerse
+GET {{host}}/api/Mushaf/chapters/1/verses/287
+Accept: application/json
