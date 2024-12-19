@@ -21,5 +21,5 @@ public class Chapter
 
     //! Navigation fields
 
-    List<Verse>? Verses { get; set; }
+    public List<Verse>? Verses { get; set; }
 }

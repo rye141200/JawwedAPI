@@ -48,6 +48,7 @@ public static class AppServicesExtensions
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddScoped<IBookmarkServices, BookmarkServices>();
+        services.AddScoped<IMushafServices, MushafServices>();
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
         services.AddExceptionHandler<GlobalErrorHandler>();
         return services;

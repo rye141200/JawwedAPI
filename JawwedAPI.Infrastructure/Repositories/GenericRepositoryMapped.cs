@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using JawwedAPI.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
@@ -8,23 +7,26 @@ namespace JawwedAPI.Infrastructure.Repositories;
 
 public class GenericRepositoryMapped<T, M>(ApplicationDbContext context, IMapper mapper) : IGenericRepositoryMapped<T, M> where T : class where M : class
 {
-
-    public async Task<M?> FindOneMapped(Expression<Func<T, bool>> predicate)
-    => await context.Set<T>().
+    public async Task<M?> FindOneMapped(Expression<Func<T, bool>> predicate) =>
+        mapper.Map<M?>(await context.Set<T>().
         Where(predicate).
-        ProjectTo<M>(mapper.ConfigurationProvider).
-        SingleOrDefaultAsync();
-    public async Task<IEnumerable<M>> GetAllMapped()
-    => await context.Set<T>().
-    ProjectTo<M>(mapper.ConfigurationProvider).
-    ToListAsync();
-    public async Task<IEnumerable<M>> Find(Expression<Func<T, bool>> predicate)
-    {
-        var entities = await context.Set<T>()
+        SingleOrDefaultAsync());
+    public async Task<IEnumerable<M>> GetAllMapped() =>
+        mapper.Map<IEnumerable<M>>(await context.Set<T>().
+        ToListAsync());
+    public async Task<IEnumerable<M>> Find(Expression<Func<T, bool>> predicate) =>
+        mapper.Map<IEnumerable<M>>(await context.Set<T>()
             .Where(predicate)
-            .ToListAsync();
+            .ToListAsync());
 
-        return mapper.Map<IEnumerable<M>>(entities);
-    }
-
+    public async Task<M?> FindOneMappedPopulated(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> includeExpression) =>
+        mapper.Map<M?>(await context.Set<T>().
+            Include(includeExpression).
+            Where(predicate).
+            SingleOrDefaultAsync());
+    
+    public async Task<IEnumerable<M>> GetAllMappedPopulated(Expression<Func<T, object>> includeExpression) =>
+        mapper.Map<IEnumerable<M>>(await context.Set<T>().
+        Include(includeExpression).
+        ToListAsync());
 }

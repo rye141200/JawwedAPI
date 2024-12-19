@@ -5,8 +5,6 @@ namespace JawwedAPI.Core.DTOs;
 
 public class LineResponse
 {
-    public int LineID { get; set; }
-
     public int LineNumber { get; set; }
 
     public string? LineType { get; set; }
@@ -20,9 +18,15 @@ public class LineResponse
 
     public bool IsCentered { get; set; }
 
-    public string? VersesKeys { get; set; }
+    public List<VerseKeyAudio> VersesKeys { get; set; } = [];
 
     public int JuzNumber { get; set; }
     public int HizbNumber { get; set; }
     public int RubHizbNumber { get; set; }
+}
+
+public class VerseKeyAudio
+{
+    public string VerseKey { get; set; } = string.Empty;
+    public List<string> Audio { get; set; } = new List<string>();
 }
