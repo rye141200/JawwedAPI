@@ -142,9 +142,6 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<int>("JuzNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LineID")
-                        .HasColumnType("int");
-
                     b.Property<int>("Page")
                         .HasColumnType("int");
 
@@ -163,8 +160,6 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasIndex("ChapterID");
 
-                    b.HasIndex("LineID");
-
                     b.ToTable("Verses");
                 });
 
@@ -176,19 +171,10 @@ namespace JawwedAPI.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JawwedAPI.Core.Domain.Entities.Line", null)
-                        .WithMany("Verses")
-                        .HasForeignKey("LineID");
-
                     b.Navigation("Chapter");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Chapter", b =>
-                {
-                    b.Navigation("Verses");
-                });
-
-            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Line", b =>
                 {
                     b.Navigation("Verses");
                 });

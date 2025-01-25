@@ -56,6 +56,9 @@ namespace JawwedAPI.Infrastructure.Migrations
                     PageNumber = table.Column<int>(type: "int", nullable: false),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsCentered = table.Column<bool>(type: "bit", nullable: false),
+                    JuzNumber = table.Column<int>(type: "int", nullable: true),
+                    HizbNumber = table.Column<int>(type: "int", nullable: true),
+                    RubHizbNumber = table.Column<int>(type: "int", nullable: true),
                     VersesKeys = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -74,8 +77,7 @@ namespace JawwedAPI.Infrastructure.Migrations
                     Page = table.Column<int>(type: "int", nullable: false),
                     Sajdah = table.Column<bool>(type: "bit", nullable: false),
                     TextUthmani = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ChapterID = table.Column<int>(type: "int", nullable: false),
-                    LineID = table.Column<int>(type: "int", nullable: true)
+                    ChapterID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,22 +88,12 @@ namespace JawwedAPI.Infrastructure.Migrations
                         principalTable: "Chapters",
                         principalColumn: "ChapterID",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Verses_Lines_LineID",
-                        column: x => x.LineID,
-                        principalTable: "Lines",
-                        principalColumn: "LineID");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Verses_ChapterID",
                 table: "Verses",
                 column: "ChapterID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Verses_LineID",
-                table: "Verses",
-                column: "LineID");
         }
 
         /// <inheritdoc />
@@ -111,13 +103,13 @@ namespace JawwedAPI.Infrastructure.Migrations
                 name: "Bookmarks");
 
             migrationBuilder.DropTable(
+                name: "Lines");
+
+            migrationBuilder.DropTable(
                 name: "Verses");
 
             migrationBuilder.DropTable(
                 name: "Chapters");
-
-            migrationBuilder.DropTable(
-                name: "Lines");
         }
     }
 }

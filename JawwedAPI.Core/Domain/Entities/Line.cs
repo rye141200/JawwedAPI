@@ -32,6 +32,6 @@ public class Line
 
     public string? VersesKeys { get; set; }
     //! Navigation fields
-    public List<Verse>? Verses { get; set; }
+    //public List<Verse>? Verses { get; set; }
 
 }

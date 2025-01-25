@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JawwedAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241215174236_InitialCreate")]
+    [Migration("20250125142631_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,8 +94,14 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LineID"));
 
+                    b.Property<int?>("HizbNumber")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsCentered")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("JuzNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("LineNumber")
                         .HasColumnType("int");
@@ -105,6 +111,9 @@ namespace JawwedAPI.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PageNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RubHizbNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("SurahNumber")
@@ -136,9 +145,6 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<int>("JuzNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LineID")
-                        .HasColumnType("int");
-
                     b.Property<int>("Page")
                         .HasColumnType("int");
 
@@ -157,27 +163,21 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasIndex("ChapterID");
 
-                    b.HasIndex("LineID");
-
                     b.ToTable("Verses");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Verse", b =>
                 {
                     b.HasOne("JawwedAPI.Core.Domain.Entities.Chapter", "Chapter")
-                        .WithMany()
+                        .WithMany("Verses")
                         .HasForeignKey("ChapterID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JawwedAPI.Core.Domain.Entities.Line", null)
-                        .WithMany("Verses")
-                        .HasForeignKey("LineID");
-
                     b.Navigation("Chapter");
                 });
 
-            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Line", b =>
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Chapter", b =>
                 {
                     b.Navigation("Verses");
                 });

@@ -22,10 +22,10 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
             .Property(c => c.ChapterID) // Replace 'Id' with the actual primary key property name for Chapter
             .ValueGeneratedNever(); // Disables identity for this primary key
 
-        modelBuilder.Entity<Verse>()
+        /* modelBuilder.Entity<Verse>()
         .HasOne<Line>()
         .WithMany(l => l.Verses)
         .HasForeignKey("LineID")
-        .OnDelete(DeleteBehavior.ClientSetNull);
+        .OnDelete(DeleteBehavior.ClientSetNull); */
     }
 }

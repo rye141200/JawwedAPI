@@ -47,10 +47,11 @@ public class Program
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jawwed API V1");
         });
-
         app.UseStaticFiles();
         app.UseRouting();
         app.MapControllers();
+
+        app.MapGet("/", async () => await app.SeedData());
 
         app.Run();
     }
