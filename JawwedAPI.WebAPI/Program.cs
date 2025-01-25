@@ -51,7 +51,7 @@ public class Program
         app.UseRouting();
         app.MapControllers();
 
-        app.MapGet("/", async () => await app.SeedData());
+        // app.MapGet("/", async () => await app.SeedData());
 
         app.Run();
     }
