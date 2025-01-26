@@ -8421,7 +8421,7 @@
     "page_number": 48,
     "surah_number": 2,
     "text": "تِجَـٰرَةً حَاضِرَةًۭ تُدِيرُونَهَا بَيْنَكُمْ فَلَيْسَ عَلَيْكُمْ جُنَاحٌ",
-    "verse_keys": "2:282,2:282:1",
+    "verse_keys": "2:282",
     "juz_number": 3,
     "hizb_number": 5,
     "rub_el_hizb_number": 19
@@ -8433,7 +8433,7 @@
     "page_number": 48,
     "surah_number": 2,
     "text": "أَلَّا تَكْتُبُوهَا ۗ وَأَشْهِدُوٓا۟ إِذَا تَبَايَعْتُمْ ۚ وَلَا يُضَآرَّ كَاتِبٌۭ",
-    "verse_keys": "2:282:1",
+    "verse_keys": "2:282",
     "juz_number": 3,
     "hizb_number": 5,
     "rub_el_hizb_number": 19
@@ -8445,7 +8445,7 @@
     "page_number": 48,
     "surah_number": 2,
     "text": "وَلَا شَهِيدٌۭ ۚ وَإِن تَفْعَلُوا۟ فَإِنَّهُۥ فُسُوقٌۢ بِكُمْ ۗ وَٱتَّقُوا۟",
-    "verse_keys": "2:282:1",
+    "verse_keys": "2:282",
     "juz_number": 3,
     "hizb_number": 5,
     "rub_el_hizb_number": 19
@@ -8457,7 +8457,7 @@
     "page_number": 48,
     "surah_number": 2,
     "text": "ٱللَّهَ ۖ وَيُعَلِّمُكُمُ ٱللَّهُ ۗ وَٱللَّهُ بِكُلِّ شَىْءٍ عَلِيمٌۭ ٢٨٢",
-    "verse_keys": "2:282:1",
+    "verse_keys": "2:282",
     "juz_number": 3,
     "hizb_number": 5,
     "rub_el_hizb_number": 19
@@ -61097,6 +61097,18 @@
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
+    "text": "قَدْ أَفْلَحَ ٱلْمُؤْمِنُونَ ١ ٱلَّذِينَ هُمْ فِى صَلَاتِهِمْ خَـٰشِعُونَ",
+    "verse_keys": "23:1,23:2",
+    "juz_number": 18,
+    "hizb_number": 35,
+    "rub_el_hizb_number": 137
+  },
+  {
+    "is_centered": 0,
+    "line_number": 3,
+    "line_type": "ayah",
+    "page_number": 342,
+    "surah_number": 23,
     "text": "٢ وَٱلَّذِينَ هُمْ عَنِ ٱللَّغْوِ مُعْرِضُونَ ٣ وَٱلَّذِينَ هُمْ لِلزَّكَوٰةِ",
     "verse_keys": "23:2,23:3,23:4",
     "juz_number": 18,
@@ -61105,7 +61117,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 3,
+    "line_number": 4,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61117,7 +61129,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 4,
+    "line_number": 5,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61129,7 +61141,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 5,
+    "line_number": 6,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61141,7 +61153,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 6,
+    "line_number": 7,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61153,7 +61165,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 7,
+    "line_number": 8,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61165,7 +61177,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 8,
+    "line_number": 9,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61177,7 +61189,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 9,
+    "line_number": 10,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61189,7 +61201,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 10,
+    "line_number": 11,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61201,7 +61213,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 11,
+    "line_number": 12,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61213,7 +61225,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 12,
+    "line_number": 13,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61225,7 +61237,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 13,
+    "line_number": 14,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
@@ -61237,7 +61249,7 @@
   },
   {
     "is_centered": 0,
-    "line_number": 14,
+    "line_number": 15,
     "line_type": "ayah",
     "page_number": 342,
     "surah_number": 23,
