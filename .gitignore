@@ -9,8 +9,8 @@ nupkg/
 .vscode/
 
 #appsettings
-./JawwedAPI.WebAPI/appsettings.json
-./JawwedAPI.WebAPI/appsettings.Development.json
+/JawwedAPI.WebAPI/appsettings.json
+/JawwedAPI.WebAPI/appsettings.Development.json
 
 # Rider
 .idea/
