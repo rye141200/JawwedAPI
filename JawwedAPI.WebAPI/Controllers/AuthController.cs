@@ -1,15 +1,8 @@
 using System.Security.Claims;
-using Google.Apis.Auth;
 using JawwedAPI.Core.DTOs;
-using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
-using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace JawwedAPI.WebAPI.Controllers;
 

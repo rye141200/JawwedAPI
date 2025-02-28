@@ -2,6 +2,7 @@ using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.Exceptions;
 using JawwedAPI.Core.Options;
+using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
@@ -58,7 +59,7 @@ public static class AppServicesExtensions
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
+                    ClockSkew = TimeSpan.FromMinutes(1),
                 };
             });
 
@@ -106,6 +107,7 @@ public static class AppServicesExtensions
         services.AddScoped<IBookmarkServices, BookmarkServices>();
         services.AddScoped<IMushafServices, MushafServices>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
         services.Configure<JwtOptions>(config.GetSection("Authentication").GetSection("JWT"));
         services.Configure<GoogleAuthenticationOptions>(
