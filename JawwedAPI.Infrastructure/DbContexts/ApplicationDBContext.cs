@@ -11,17 +11,35 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<Line> Lines { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Verse>()
+        modelBuilder
+            .Entity<Verse>()
             .Property(v => v.VerseID) // Replace 'Id' with the actual primary key property name for Verse
             .ValueGeneratedNever(); // Disables identity for this primary key
 
-        modelBuilder.Entity<Chapter>()
+        modelBuilder
+            .Entity<Chapter>()
             .Property(c => c.ChapterID) // Replace 'Id' with the actual primary key property name for Chapter
             .ValueGeneratedNever(); // Disables identity for this primary key
 
+        modelBuilder.Entity<ApplicationUser>().HasIndex(user => user.Email).IsUnique();
+
+        modelBuilder
+            .Entity<ApplicationUser>()
+            .HasData(
+                [
+                    new() { Email = "thecityhunterhd@gmail.com", UserName = "Ahmad Mahfouz" },
+                    new()
+                    {
+                        Email = "ahmad.mhfz1412@gmail.com",
+                        UserName = "Ahmad Mahfouz",
+                        UserRole = ApplicationRoles.Premium,
+                    },
+                ]
+            );
         /* modelBuilder.Entity<Verse>()
         .HasOne<Line>()
         .WithMany(l => l.Verses)

@@ -4,6 +4,7 @@ using JawwedAPI.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JawwedAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303234940_ApplicationUser")]
+    partial class ApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,7 +33,7 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(70)
@@ -41,22 +44,19 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("ApplicationUsers");
 
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("38e70178-e001-4983-8c2a-42202da0fea5"),
+                            UserId = new Guid("b649f808-b43b-4ed2-806e-a018221b1e19"),
                             Email = "thecityhunterhd@gmail.com",
                             UserName = "Ahmad Mahfouz",
                             UserRole = 0
                         },
                         new
                         {
-                            UserId = new Guid("449250d6-273b-4fb2-ab97-7700a8cddf89"),
+                            UserId = new Guid("e2b4972d-79c6-424c-867d-b68e405c5179"),
                             Email = "ahmad.mhfz1412@gmail.com",
                             UserName = "Ahmad Mahfouz",
                             UserRole = 1

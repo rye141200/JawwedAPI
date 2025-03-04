@@ -1,7 +1,9 @@
 using System.Linq.Expressions;
+
 namespace JawwedAPI.Core.Domain.RepositoryInterfaces;
 
-public interface IGenericRepository<T> where T : class
+public interface IGenericRepository<T>
+    where T : class
 {
     /// <summary>
     /// Gets a list of all entities in the database.
@@ -22,6 +24,13 @@ public interface IGenericRepository<T> where T : class
     /// Adds a new entity to the database.
     /// </summary>
     Task Create(T entity);
+
+    /// <summary>
+    /// Adds a new entity and returns it (Note that you still need to call SaveChangesAsync)
+    /// </summary>
+    /// <param name="entity">Entity to be added</param>
+    /// <returns>The added entity</returns>
+    public Task<T> CreateAndGet(T entity);
 
     /// <summary>
     /// Removes an entity from the database.
@@ -51,11 +60,13 @@ public interface IGenericRepository<T> where T : class
     /// <summary>
     /// Finds a single entity that matches a specific condition and includes related data based on the provided expression.
     /// </summary>
-    Task<T?> FindOneAndPopulateAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> includeExpression);
-
+    Task<T?> FindOneAndPopulateAsync(
+        Expression<Func<T, bool>> predicate,
+        Expression<Func<T, object>> includeExpression
+    );
 }
 
-/* 
+/*
     public async Task<IEnumerable<T>> ExecuteStoredProcedure(int pageNumber, string procedureName, string procedureParameterName)
     => await context.Set<T>()
         .FromSqlRaw($"EXEC {procedureName} @{procedureParameterName}", new SqlParameter(procedureParameterName, pageNumber))

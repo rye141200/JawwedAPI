@@ -9,7 +9,7 @@ namespace JawwedAPI.WebAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Produces("application/json")]
-public class MushafController(IMushafServices mushafServices) : ControllerBase
+public class MushafController(IMushafServices mushafServices) : CustomBaseController
 {
     /// <summary>
     /// Gets all lines on a specific Mushaf page
@@ -38,7 +38,10 @@ public class MushafController(IMushafServices mushafServices) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetVerse(int chapterNumber, int verseNumber)
     {
-        VerseResponse verse = await mushafServices.GetVerseByChapterNumberAndVerseNumber(chapterNumber, verseNumber);
+        VerseResponse verse = await mushafServices.GetVerseByChapterNumberAndVerseNumber(
+            chapterNumber,
+            verseNumber
+        );
         return Ok(verse);
     }
 
@@ -72,4 +75,3 @@ public class MushafController(IMushafServices mushafServices) : ControllerBase
         return Ok(chapter);
     }
 }
-
