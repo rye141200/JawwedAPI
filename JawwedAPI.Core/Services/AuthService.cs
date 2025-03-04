@@ -1,7 +1,10 @@
 using System;
 using System.Text.Json;
 using Google.Apis.Auth;
+using JawwedAPI.Core.Domain.Entities;
+using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.DTOs;
+using JawwedAPI.Core.Exceptions.CustomExceptions;
 using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
@@ -12,25 +15,54 @@ namespace JawwedAPI.Core.Services;
 
 public class AuthService(
     IOptions<GoogleAuthenticationOptions> googleOptions,
-    ITokenService tokenService
+    ITokenService tokenService,
+    IGenericRepository<ApplicationUser> userRepository
 ) : IAuthService
 {
     public async Task<string> LoginAndGenerateToken(GoogleLoginRequest request)
     {
-        PrintExpirationTime(request);
-        // Disable most validations for now to isolate the issue
+        //PrintExpirationTime(request);
         var settings = new GoogleJsonWebSignature.ValidationSettings()
         {
             Audience = [googleOptions.Value.ClientId],
             HostedDomain = null,
         };
 
-        var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, settings);
+        //!2) Validate token
+        //TODO when error handler is fixed, return the proper message if we encounter InvalidJwtException
+        GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(
+            request.IdToken,
+            settings
+        );
 
-        // Generate our token
-        var token = tokenService.GenerateToken(payload.Subject, payload.Email, payload.Name);
+        if (!payload.EmailVerified)
+            throw new GlobalErrorThrower(
+                400,
+                "Could not validate google token id, please try again."
+            );
+
+        //!3) If the user exists, fetch him, if not create a new one and log him in.
+        ApplicationUser? user = await userRepository.FindOne(user => user.Email == payload.Email);
+
+        if (user == null)
+        {
+            user = await userRepository.CreateAndGet(
+                new() { Email = payload.Email, UserName = payload.Name }
+            );
+            await userRepository.SaveChangesAsync();
+        }
+
+        //!4) Generate our token
+        string token = tokenService.GenerateToken(
+            user.UserId,
+            user.Email,
+            user.UserName,
+            user.UserRole.ToString()
+        );
         return token;
     }
+
+    public async Task<List<ApplicationUser>> GetAllUsers() => [.. await userRepository.GetAll()];
 
     private void PrintExpirationTime(GoogleLoginRequest request)
     {

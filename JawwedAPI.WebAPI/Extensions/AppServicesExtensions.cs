@@ -114,6 +114,7 @@ public static class AppServicesExtensions
             config.GetSection("Authentication").GetSection("Google")
         );
         services.AddExceptionHandler<GlobalErrorHandler>();
+        services.AddProblemDetails();
         return services;
     }
 }

@@ -11,7 +11,7 @@ namespace JawwedAPI.Core.Services;
 
 public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
 {
-    public string GenerateToken(string userId, string email, string? name)
+    public string GenerateToken(Guid userId, string email, string? name, string role)
     {
         //!1) Config extraction
         var key = Encoding.ASCII.GetBytes(jwtOptions.Value.Key);
@@ -23,8 +23,10 @@ public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
         //!2) Claims
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, userId),
+            new(ClaimTypes.NameIdentifier, userId.ToString()),
             new(ClaimTypes.Email, email),
+            new(ClaimTypes.Name, name ?? ""),
+            new(ClaimTypes.Role, role),
         };
         if (name != null)
             claims.Add(new(ClaimTypes.Name, name));
