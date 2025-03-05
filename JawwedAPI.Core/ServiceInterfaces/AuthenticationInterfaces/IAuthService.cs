@@ -7,7 +7,7 @@ namespace JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
 
 public interface IAuthService
 {
-    Task<string> LoginAndGenerateToken(GoogleLoginRequest request);
+    Task<AuthResponse> GoogleLogin(GoogleLoginRequest request);
 
     Task<List<ApplicationUser>> GetAllUsers();
 }

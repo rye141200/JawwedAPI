@@ -19,12 +19,12 @@ public class AuthService(
     IGenericRepository<ApplicationUser> userRepository
 ) : IAuthService
 {
-    public async Task<string> LoginAndGenerateToken(GoogleLoginRequest request)
+    public async Task<AuthResponse> GoogleLogin(GoogleLoginRequest request)
     {
         //PrintExpirationTime(request);
         var settings = new GoogleJsonWebSignature.ValidationSettings()
         {
-            Audience = [googleOptions.Value.ClientId],
+            Audience = [googleOptions.Value.ClientId, googleOptions.Value.AndroidClientId],
             HostedDomain = null,
         };
 
@@ -59,7 +59,14 @@ public class AuthService(
             user.UserName,
             user.UserRole.ToString()
         );
-        return token;
+
+        return new AuthResponse()
+        {
+            Email = user.Email,
+            Name = user.UserName ?? "",
+            Token = token,
+        };
+        ;
     }
 
     public async Task<List<ApplicationUser>> GetAllUsers() => [.. await userRepository.GetAll()];

@@ -13,10 +13,10 @@ public class AuthController(IAuthService authService) : CustomBaseController
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
     {
-        string token;
+        AuthResponse response;
         try
         {
-            token = await authService.LoginAndGenerateToken(request);
+            response = await authService.GoogleLogin(request);
         }
         catch (Exception ex)
         {
@@ -26,7 +26,7 @@ public class AuthController(IAuthService authService) : CustomBaseController
                 title: "Invalid JWT"
             );
         }
-        return Ok(new { token = token });
+        return Ok(response);
     }
 
     [Authorize]
