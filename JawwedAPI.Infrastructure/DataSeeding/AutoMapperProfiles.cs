@@ -27,5 +27,6 @@ public class AutoMapperProfiles : Profile
         CreateMap<JsonChapter, Chapter>();
         CreateMap<JsonLine, Line>();
         CreateMap<JsonVerse, Verse>();
+        CreateMap<Mofasir, MofasirResponse>();
     }
 }

@@ -169,6 +169,54 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.ToTable("Lines");
                 });
 
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Mofasir", b =>
+                {
+                    b.Property<int>("MofasirID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MofasirID"));
+
+                    b.Property<string>("AuthorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BookName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Languages")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MofasirID");
+
+                    b.ToTable("Mofasirs");
+                });
+
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Tafsir", b =>
+                {
+                    b.Property<int>("TafsirID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TafsirID"));
+
+                    b.Property<string>("ChapterVerseID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MofasirID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TafsirID");
+
+                    b.HasIndex("MofasirID");
+
+                    b.ToTable("Tafsirs");
+                });
+
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Verse", b =>
                 {
                     b.Property<int>("VerseID")
@@ -204,6 +252,17 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.ToTable("Verses");
                 });
 
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Tafsir", b =>
+                {
+                    b.HasOne("JawwedAPI.Core.Domain.Entities.Mofasir", "Mofasir")
+                        .WithMany("Tafsirs")
+                        .HasForeignKey("MofasirID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mofasir");
+                });
+
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Verse", b =>
                 {
                     b.HasOne("JawwedAPI.Core.Domain.Entities.Chapter", "Chapter")
@@ -218,6 +277,11 @@ namespace JawwedAPI.Infrastructure.Migrations
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Chapter", b =>
                 {
                     b.Navigation("Verses");
+                });
+
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Mofasir", b =>
+                {
+                    b.Navigation("Tafsirs");
                 });
 #pragma warning restore 612, 618
         }

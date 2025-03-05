@@ -1,5 +1,8 @@
 using System.Reflection;
+using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.Helpers;
+using JawwedAPI.Infrastructure.DataSeeding;
+using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
 using JawwedAPI.Infrastructure.DbContexts;
 using JawwedAPI.WebAPI.Extensions;
 using Microsoft.OpenApi.Models;
@@ -8,7 +11,7 @@ namespace JawwedAPI.WebAPI;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -45,12 +48,14 @@ public class Program
 
         var app = builder.Build();
 
+
+
+
         // Configure middleware pipeline
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler(_ => { });
+            app.UseExceptionHandler(options => { });
         }
-
         // Enable Swagger middleware
         app.UseSwagger();
         app.UseSwaggerUI(c =>
@@ -63,6 +68,13 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+
+
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        //     await TafsirSeeding.SeedDataAsync(dbContext);
+        // }
 
         // app.MapGet("/", async () => await app.SeedData());
 
