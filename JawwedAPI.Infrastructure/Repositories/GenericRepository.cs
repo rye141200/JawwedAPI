@@ -28,10 +28,21 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
     => await context.Set<T>().FirstOrDefaultAsync(predicate);
 
     public async Task<IEnumerable<T>> GetAllAndPopulateAsync(Expression<Func<T, object>> includeExpression) =>
-    await context.Set<T>().Include(includeExpression).ToListAsync();
+    await context.Set<T>().Include(includeExpression).AsNoTracking().ToListAsync();
+
+    public async Task<List<TResult>> GetFilteredAndProjectAsync<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> includeExpression, Expression<Func<T, TResult>> selector)
+    {
+        return await context.Set<T>()
+          .Include(includeExpression)
+          .AsNoTracking()
+          .Where(predicate)
+          .Select(selector)
+          .ToListAsync();
+    }
 
     public async Task<T?> FindOneAndPopulateAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> includeExpression)
     => await context.Set<T>().Include(includeExpression).FirstOrDefaultAsync(predicate);
+
 
     //$@"EXEC {procedureName} @{procedureParameterName} = {pageNumber}"
 

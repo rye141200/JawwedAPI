@@ -11,6 +11,8 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<Line> Lines { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
+    public DbSet<Mofasir> Mofasirs { get; set; }
+    public DbSet<Tafsir> Tafsirs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,5 +29,8 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
         .WithMany(l => l.Verses)
         .HasForeignKey("LineID")
         .OnDelete(DeleteBehavior.ClientSetNull); */
+
+
+
     }
 }

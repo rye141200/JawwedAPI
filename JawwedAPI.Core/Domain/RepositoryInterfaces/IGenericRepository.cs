@@ -47,6 +47,18 @@ public interface IGenericRepository<T> where T : class
     /// Gets all entities and includes related data based on the provided expression.
     /// </summary>
     Task<IEnumerable<T>> GetAllAndPopulateAsync(Expression<Func<T, object>> includeExpression);
+    /// <summary>
+    /// finds all entities that matches a specific condition with including property and 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="predicate"></param>
+    /// <param name="includeExpression"></param>
+    /// <param name="selector"></param>
+    /// <returns></returns>
+    Task<List<TResult>> GetFilteredAndProjectAsync<TResult>(
+     Expression<Func<T, bool>> predicate,
+     Expression<Func<T, object>> includeExpression,
+     Expression<Func<T, TResult>> selector);
 
     /// <summary>
     /// Finds a single entity that matches a specific condition and includes related data based on the provided expression.

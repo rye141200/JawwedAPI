@@ -18,8 +18,4 @@
     <ProjectReference Include="..\JawwedAPI.Core\JawwedAPI.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DataSeeding\Assets\" />
-  </ItemGroup>
-
 </Project>

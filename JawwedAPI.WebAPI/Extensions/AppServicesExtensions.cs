@@ -47,6 +47,8 @@ public static class AppServicesExtensions
     {
         services.AddScoped<IBookmarkServices, BookmarkServices>();
         services.AddScoped<IMushafServices, MushafServices>();
+        services.AddScoped<ITafsirService, TafsirService>();
+        services.AddScoped<IMofasirService, MofasirService>();
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
         services.AddExceptionHandler<GlobalErrorHandler>();
         return services;

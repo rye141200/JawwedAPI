@@ -4,7 +4,7 @@ namespace JawwedAPI.Core.Exceptions.CustomExceptions;
 
 public class GlobalErrorThrower : Exception
 {
-    int StatusCode { get; set; }
+    public int StatusCode { get; set; }
     public string Title { get; set; }
     public string Detail { get; set; }
 
