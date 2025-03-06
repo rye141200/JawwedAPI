@@ -49,14 +49,14 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("38e70178-e001-4983-8c2a-42202da0fea5"),
+                            UserId = new Guid("bd62576b-0410-42ce-9a3b-213c519fa08a"),
                             Email = "thecityhunterhd@gmail.com",
                             UserName = "Ahmad Mahfouz",
                             UserRole = 0
                         },
                         new
                         {
-                            UserId = new Guid("449250d6-273b-4fb2-ab97-7700a8cddf89"),
+                            UserId = new Guid("5b515abf-ec66-4d9e-aecc-645e0ccb9112"),
                             Email = "ahmad.mhfz1412@gmail.com",
                             UserName = "Ahmad Mahfouz",
                             UserRole = 1
@@ -250,6 +250,38 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.HasIndex("ChapterID");
 
                     b.ToTable("Verses");
+                });
+
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Zekr", b =>
+                {
+                    b.Property<int>("ZekrID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Audio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CategoryAudio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.HasKey("ZekrID");
+
+                    b.ToTable("Azkar");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Tafsir", b =>

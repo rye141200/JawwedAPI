@@ -56,8 +56,14 @@ public interface IGenericRepository<T>
     /// Gets all entities and includes related data based on the provided expression.
     /// </summary>
     Task<IEnumerable<T>> GetAllAndPopulateAsync(Expression<Func<T, object>> includeExpression);
+
+    Task<List<TResult>> GetFilteredAndProjectWithoutIncludeAsync<TResult>(
+        Expression<Func<T, bool>> predicate,
+        Expression<Func<T, TResult>> selector
+    );
+
     /// <summary>
-    /// finds all entities that matches a specific condition with including property and 
+    /// finds all entities that matches a specific condition with including property and
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="predicate"></param>
@@ -65,9 +71,10 @@ public interface IGenericRepository<T>
     /// <param name="selector"></param>
     /// <returns></returns>
     Task<List<TResult>> GetFilteredAndProjectAsync<TResult>(
-     Expression<Func<T, bool>> predicate,
-     Expression<Func<T, object>> includeExpression,
-     Expression<Func<T, TResult>> selector);
+        Expression<Func<T, bool>> predicate,
+        Expression<Func<T, object>> includeExpression,
+        Expression<Func<T, TResult>> selector
+    );
 
     /// <summary>
     /// Finds a single entity that matches a specific condition and includes related data based on the provided expression.
@@ -75,6 +82,9 @@ public interface IGenericRepository<T>
     Task<T?> FindOneAndPopulateAsync(
         Expression<Func<T, bool>> predicate,
         Expression<Func<T, object>> includeExpression
+    );
+    public Task<List<TResult>> GetDistinctAndProjectAsync<TResult>(
+        Expression<Func<T, TResult>> selector
     );
 }
 

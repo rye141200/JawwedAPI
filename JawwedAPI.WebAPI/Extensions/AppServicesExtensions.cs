@@ -110,6 +110,7 @@ public static class AppServicesExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITafsirService, TafsirService>();
         services.AddScoped<IMofasirService, MofasirService>();
+        services.AddScoped<IAzkarService, AzkarService>();
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
         services.Configure<JwtOptions>(config.GetSection("Authentication").GetSection("JWT"));
         services.Configure<GoogleAuthenticationOptions>(

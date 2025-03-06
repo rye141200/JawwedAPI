@@ -48,9 +48,6 @@ public class Program
 
         var app = builder.Build();
 
-
-
-
         // Configure middleware pipeline
         if (!app.Environment.IsDevelopment())
         {
@@ -68,7 +65,6 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-
 
         // using (var scope = app.Services.CreateScope())
         // {

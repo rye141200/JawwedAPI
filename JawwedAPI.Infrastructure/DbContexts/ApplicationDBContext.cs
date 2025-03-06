@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<Mofasir> Mofasirs { get; set; }
     public DbSet<Tafsir> Tafsirs { get; set; }
+    public DbSet<Zekr> Azkar { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +26,11 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
         modelBuilder
             .Entity<Chapter>()
             .Property(c => c.ChapterID) // Replace 'Id' with the actual primary key property name for Chapter
+            .ValueGeneratedNever(); // Disables identity for this primary key
+
+        modelBuilder
+            .Entity<Zekr>()
+            .Property(c => c.ZekrID) // Replace 'Id' with the actual primary key property name for Zekr
             .ValueGeneratedNever(); // Disables identity for this primary key
 
         modelBuilder.Entity<ApplicationUser>().HasIndex(user => user.Email).IsUnique();
@@ -47,8 +53,5 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
         .WithMany(l => l.Verses)
         .HasForeignKey("LineID")
         .OnDelete(DeleteBehavior.ClientSetNull); */
-
-
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace JawwedAPI.Core.Domain.Entities;
 
 public class Verse
@@ -11,7 +12,6 @@ public class Verse
     [Required]
     [Range(1, 286)]
     public int VerseNumber { get; set; }
-
 
     [Required]
     [Range(1, 30)]
@@ -34,7 +34,6 @@ public class Verse
     //! Foreign => Chapter
     [ForeignKey("Chapter")]
     public int ChapterID { get; set; }
-
 
     //! Navigational property
     public virtual Chapter? Chapter { get; set; }

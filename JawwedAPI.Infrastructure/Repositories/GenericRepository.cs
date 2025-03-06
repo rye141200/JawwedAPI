@@ -28,24 +28,49 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
     public async Task<T?> FindOne(Expression<Func<T, bool>> predicate) =>
         await context.Set<T>().FirstOrDefaultAsync(predicate);
 
-    public async Task<IEnumerable<T>> GetAllAndPopulateAsync(Expression<Func<T, object>> includeExpression) =>
-    await context.Set<T>().Include(includeExpression).AsNoTracking().ToListAsync();
+    public async Task<IEnumerable<T>> GetAllAndPopulateAsync(
+        Expression<Func<T, object>> includeExpression
+    ) => await context.Set<T>().Include(includeExpression).AsNoTracking().ToListAsync();
 
-    public async Task<List<TResult>> GetFilteredAndProjectAsync<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> includeExpression, Expression<Func<T, TResult>> selector)
+    public async Task<List<TResult>> GetFilteredAndProjectAsync<TResult>(
+        Expression<Func<T, bool>> predicate,
+        Expression<Func<T, object>> includeExpression,
+        Expression<Func<T, TResult>> selector
+    )
     {
-        return await context.Set<T>()
-          .Include(includeExpression)
-          .AsNoTracking()
-          .Where(predicate)
-          .Select(selector)
-          .ToListAsync();
+        return await context
+            .Set<T>()
+            .Include(includeExpression)
+            .AsNoTracking()
+            .Where(predicate)
+            .Select(selector)
+            .ToListAsync();
+    }
+
+    public async Task<List<TResult>> GetFilteredAndProjectWithoutIncludeAsync<TResult>(
+        Expression<Func<T, bool>> predicate,
+        Expression<Func<T, TResult>> selector
+    )
+    {
+        return await context
+            .Set<T>()
+            .AsNoTracking()
+            .Where(predicate)
+            .Select(selector)
+            .ToListAsync();
+    }
+
+    public async Task<List<TResult>> GetDistinctAndProjectAsync<TResult>(
+        Expression<Func<T, TResult>> selector
+    )
+    {
+        return await context.Set<T>().AsNoTracking().Select(selector).Distinct().ToListAsync();
     }
 
     public async Task<T?> FindOneAndPopulateAsync(
         Expression<Func<T, bool>> predicate,
         Expression<Func<T, object>> includeExpression
     ) => await context.Set<T>().Include(includeExpression).FirstOrDefaultAsync(predicate);
-
 
     //$@"EXEC {procedureName} @{procedureParameterName} = {pageNumber}"
 }
