@@ -13,9 +13,21 @@ public class AzkarController(IAzkarService azkarService) : CustomBaseController
         return Ok(await azkarService.GetAzkarCategories());
     }
 
-    [HttpGet("categories/{id}")]
-    public async Task<IActionResult> GetAzkarCategories(int id)
+    [HttpGet("{categoryId}")]
+    public async Task<IActionResult> GetAzkarFromCategory(int categoryId)
     {
-        return Ok(await azkarService.GetZekrById(id));
+        return Ok(await azkarService.GetZekrById(categoryId));
+    }
+
+    [HttpGet("random")]
+    public async Task<IActionResult> GetRandomZekr()
+    {
+        return Ok(await azkarService.GetRandomZekr());
+    }
+
+    [HttpGet("{categoryId}/random")]
+    public async Task<IActionResult> GetRandomZekrFromCategory(int categoryId)
+    {
+        return Ok(await azkarService.GetRandomZekrFromCategory(categoryId));
     }
 }

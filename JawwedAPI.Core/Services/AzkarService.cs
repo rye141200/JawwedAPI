@@ -11,10 +11,6 @@ using Microsoft.Extensions.Logging;
 
 namespace JawwedAPI.Core.Services;
 
-/// <summary>
-/// Service for retrieving and managing Azkar (Islamic remembrances)
-/// Provides methods to fetch Azkar categories and individual Azkar by category
-/// </summary>
 public class AzkarService : IAzkarService
 {
     private readonly IGenericRepository<Zekr> _azkarRepository;
@@ -36,10 +32,6 @@ public class AzkarService : IAzkarService
             ?? throw new InvalidOperationException("AzkarAudioBaseLink configuration is missing");
     }
 
-    /// <summary>
-    /// Gets all available categories of Azkar
-    /// </summary>
-    /// <returns>List of Zekr categories with their metadata</returns>
     public async Task<List<ZekrCategoryResponse>> GetAzkarCategories()
     {
         _logger?.LogDebug("Getting all Azkar categories");
@@ -72,17 +64,11 @@ public class AzkarService : IAzkarService
         }
     }
 
-    /// <summary>
-    /// Gets all Azkar items for a specific category
-    /// </summary>
-    /// <param name="categoryId">The ID of the category to retrieve</param>
-    /// <returns>Zekr category with all associated Azkar items</returns>
-    /// <exception cref="GlobalErrorThrower">Thrown when category doesn't exist or parameters are invalid</exception>
     public async Task<ZekrResponse> GetZekrById(int categoryId)
     {
         _logger?.LogDebug("Getting Azkar for category with ID {CategoryId}", categoryId);
 
-        // Validate input
+        //! 1) Validate input
         if (categoryId <= 0)
         {
             _logger?.LogWarning("Invalid categoryId provided: {CategoryId}", categoryId);
@@ -95,7 +81,7 @@ public class AzkarService : IAzkarService
 
         try
         {
-            // Get the category information
+            //! 2) Get the category information
             var zekrCategory = await _azkarRepository.FindOne(z => z.CategoryId == categoryId);
 
             if (zekrCategory == null)
@@ -113,6 +99,7 @@ public class AzkarService : IAzkarService
                 z => z.CategoryId == categoryId,
                 z => new ZekrItemResponse()
                 {
+                    ZekrID = z.ZekrID,
                     Content = z.Content,
                     Audio = $"{_baseLink}/{z.Audio}",
                     Count = z.Count,
@@ -149,6 +136,133 @@ public class AzkarService : IAzkarService
                 500,
                 "Server Error",
                 "An error occurred while retrieving the Azkar data."
+            );
+        }
+    }
+
+    public async Task<RandomZekrResponse> GetRandomZekr()
+    {
+        _logger?.LogDebug("Getting a random Zekr");
+
+        try
+        {
+            // Get the total count of Zekr items
+            var allZekr = await _azkarRepository.GetAll();
+            var totalCount = allZekr.Count();
+
+            if (totalCount == 0)
+            {
+                _logger?.LogWarning("No Zekr items found in the database");
+                throw new GlobalErrorThrower(
+                    404,
+                    "No Content",
+                    "No Azkar are available in the database."
+                );
+            }
+
+            // Generate a random index
+            var random = new Random();
+            var randomIndex = random.Next(0, totalCount);
+
+            // Get the random Zekr (convert to list for indexing)
+            var randomZekr = allZekr.ToList()[randomIndex];
+
+            // Create the response
+            var response = new RandomZekrResponse
+            {
+                ZekrID = randomZekr.ZekrID,
+                CategoryId = randomZekr.CategoryId,
+                Category = randomZekr.Category,
+                Content = randomZekr.Content,
+                Count = randomZekr.Count,
+                Audio = $"{_baseLink}/{randomZekr.Audio}",
+            };
+
+            _logger?.LogInformation(
+                "Successfully retrieved random Zekr with ID {ZekrId}",
+                randomZekr.ZekrID
+            );
+            return response;
+        }
+        catch (Exception ex) when (!(ex is GlobalErrorThrower))
+        {
+            _logger?.LogError(ex, "Error retrieving random Zekr");
+            throw new GlobalErrorThrower(
+                500,
+                "Server Error",
+                "An error occurred while retrieving a random Zekr."
+            );
+        }
+    }
+
+    public async Task<RandomZekrResponse> GetRandomZekrFromCategory(int categoryId)
+    {
+        _logger?.LogDebug("Getting a random Zekr from category with ID {CategoryId}", categoryId);
+
+        // Validate input
+        if (categoryId <= 0)
+        {
+            _logger?.LogWarning("Invalid categoryId provided: {CategoryId}", categoryId);
+            throw new GlobalErrorThrower(
+                400,
+                "Invalid Category ID",
+                "A valid category ID must be provided."
+            );
+        }
+
+        try
+        {
+            // Get all Zekr items for this category
+            var zekrItems = await _azkarRepository.Find(z => z.CategoryId == categoryId);
+            var zekrList = zekrItems.ToList();
+            var totalCount = zekrList.Count;
+
+            if (totalCount == 0)
+            {
+                _logger?.LogWarning("No Zekr items found for category ID {CategoryId}", categoryId);
+                throw new GlobalErrorThrower(
+                    404,
+                    "No Content",
+                    $"No Azkar are available for category with ID {categoryId}."
+                );
+            }
+
+            // Generate a random index
+            var random = new Random();
+            var randomIndex = random.Next(0, totalCount);
+
+            // Get the random Zekr
+            var randomZekr = zekrList[randomIndex];
+
+            // Create the response
+            var response = new RandomZekrResponse
+            {
+                ZekrID = randomZekr.ZekrID,
+                CategoryId = randomZekr.CategoryId,
+                Category = randomZekr.Category,
+                Content = randomZekr.Content,
+                Count = randomZekr.Count,
+                Audio = $"{_baseLink}/{randomZekr.Audio}",
+            };
+
+            _logger?.LogInformation(
+                "Successfully retrieved random Zekr with ID {ZekrId} from category {CategoryId}",
+                randomZekr.ZekrID,
+                categoryId
+            );
+            return response;
+        }
+        catch (Exception ex) when (!(ex is GlobalErrorThrower))
+        {
+            _logger?.LogError(
+                ex,
+                "Error retrieving random Zekr from category with ID {CategoryId}",
+                categoryId
+            );
+            throw new GlobalErrorThrower(
+                500,
+                "Server Error",
+                "An error occurred while retrieving a random Zekr from the specified category."
             );
         }
     }
