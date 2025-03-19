@@ -1,4 +1,6 @@
-
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.Exceptions.CustomExceptions;
@@ -11,18 +13,18 @@ public class MofasirService(IGenericRepository<Mofasir> mofasirRepository, ILogg
 {
 
     /// <summary>
-    /// Gets a specific Mofasir by ID
+    /// Gets a specific Mofasir by ID or name
     /// </summary>
     public async Task<Mofasir> GetMofasirInfo(string mofasirID)
     {
-        logger?.LogDebug("Getting Mofasir with ID {MofasirID}", mofasirID);
+        logger?.LogDebug("Getting Mofasir with ID/name {MofasirID}", mofasirID);
 
         // Validate input
         if (string.IsNullOrWhiteSpace(mofasirID))
         {
             logger?.LogWarning("Null or empty mofasirID provided");
             throw new GlobalErrorThrower(400, "Invalid Mofasir ID",
-                "A valid Mofasir ID must be provided.");
+                "A valid Mofasir ID or name must be provided.");
         }
 
         try
@@ -39,8 +41,11 @@ public class MofasirService(IGenericRepository<Mofasir> mofasirRepository, ILogg
             }
             else
             {
-                // If not numeric, try to find by author name
-                var mofasirByName = await mofasirRepository.FindOne(m => m.AuthorName == mofasirID);
+                // If not numeric, try to find by author name in either language
+                var mofasirByName = await mofasirRepository.FindOne(
+                    m => m.AuthorNameArabic == mofasirID ||
+                         m.AuthorNameEnglish == mofasirID);
+
                 if (mofasirByName != null)
                 {
                     return mofasirByName;

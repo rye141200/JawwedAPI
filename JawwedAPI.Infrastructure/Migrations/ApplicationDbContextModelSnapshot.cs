@@ -22,6 +22,47 @@ namespace JawwedAPI.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<int>("UserRole")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("ApplicationUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("b4f2b556-8789-4db3-b4b1-e0222f49a8e6"),
+                            Email = "thecityhunterhd@gmail.com",
+                            UserName = "Ahmad Mahfouz",
+                            UserRole = 0
+                        },
+                        new
+                        {
+                            UserId = new Guid("18e83293-3400-447c-b38b-e7e9c62bf220"),
+                            Email = "ahmad.mhfz1412@gmail.com",
+                            UserName = "Ahmad Mahfouz",
+                            UserRole = 1
+                        });
+                });
+
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Bookmark", b =>
                 {
                     b.Property<int>("BookmarkId")
@@ -136,14 +177,35 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MofasirID"));
 
-                    b.Property<string>("AuthorName")
+                    b.Property<string>("AuthorNameArabic")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BookName")
+                    b.Property<string>("AuthorNameEnglish")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Languages")
+                    b.Property<string>("BiographyArabic")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BiographyEnglish")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BirthYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BookNameArabic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BookNameEnglish")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeathYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SupportsArabic")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SupportsEnglish")
+                        .HasColumnType("bit");
 
                     b.HasKey("MofasirID");
 

@@ -10,17 +10,27 @@ namespace JawwedAPI.WebAPI.Controllers
     [ApiController]
     public class MofasirController(IMapper mapper, IMofasirService mofasirService) : ControllerBase
     {
-        [HttpGet("mofasir")]
-        public async Task<ActionResult<MofasirResponse>> getMofasirInfo(string mofasirID)
+        /// <summary>
+        /// Gets mofasir information - returns a specific mofasir if ID is provided, otherwise returns all mofasirs
+        /// </summary>
+        /// <returns>A single mofasir or list of all mofasirs</returns>
+        [HttpGet("info")]
+        public async Task<IActionResult> GetMofasirInfo(string? mofasirID = null)
         {
-            MofasirResponse mofasirResponse = mapper.Map<MofasirResponse>(await mofasirService.GetMofasirInfo(mofasirID));
-            return mofasirResponse;
-        }
-        [HttpGet("mofasirs")]
-        public async Task<ActionResult<List<MofasirResponse>>> getMofasirsInfo()
-        {
-            List<MofasirResponse> mofasirsResponse = mapper.Map<List<MofasirResponse>>(await mofasirService.GetMofasirsInfo());
-            return mofasirsResponse;
+            if (!string.IsNullOrEmpty(mofasirID))
+            {
+                // Return specific mofasir
+                var mofasir = await mofasirService.GetMofasirInfo(mofasirID);
+                var response = mapper.Map<MofasirResponse>(mofasir);
+                return Ok(response);
+            }
+            else
+            {
+                // Return all mofasirs
+                var mofasirs = await mofasirService.GetMofasirsInfo();
+                var response = mapper.Map<List<MofasirResponse>>(mofasirs);
+                return Ok(response);
+            }
         }
     }
 }

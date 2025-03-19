@@ -57,11 +57,7 @@ public class Program
         app.MapControllers();
 
 
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        //     await TafsirSeeding.SeedDataAsync(dbContext);
-        // }
+
 
         // app.MapGet("/", async () => await app.SeedData());
 
