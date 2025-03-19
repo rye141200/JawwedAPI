@@ -11,20 +11,55 @@ public class MofasirResponse
     /// <summary>
     /// Unique identifier for the Mofasir
     /// </summary>
-    public string MofasirID { get; set; } = string.Empty;
+    public int MofasirID { get; set; }
 
     /// <summary>
-    /// The name of the scholar/author
+    /// The Arabic name of the scholar/author
     /// </summary>
-    public string AuthorName { get; set; } = string.Empty;
+    public string AuthorNameArabic { get; set; } = string.Empty;
 
     /// <summary>
-    /// The title of the Tafsir book written by this Mofasir
+    /// The English name of the scholar/author
     /// </summary>
-    public string BookName { get; set; } = string.Empty;
+    public string AuthorNameEnglish { get; set; } = string.Empty;
 
     /// <summary>
-    /// Languages in which this Mofasir's works are available
+    /// The Arabic title of the Tafsir book
     /// </summary>
-    public string Languages { get; set; } = string.Empty;
+    public string BookNameArabic { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The English title of the Tafsir book
+    /// </summary>
+    public string BookNameEnglish { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Brief biography of the Mofasir in Arabic
+    /// </summary>
+    public string BiographyArabic { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Brief biography of the Mofasir in English
+    /// </summary>
+    public string BiographyEnglish { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Whether this Mofasir's works are available in Arabic
+    /// </summary>
+    public bool SupportsArabic { get; set; }
+
+    /// <summary>
+    /// Whether this Mofasir's works are available in English
+    /// </summary>
+    public bool SupportsEnglish { get; set; }
+
+    /// <summary>
+    /// Birth year of the Mofasir
+    /// </summary>
+    public string BirthYear { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Death year of the Mofasir
+    /// </summary>
+    public string DeathYear { get; set; } = string.Empty;
 }

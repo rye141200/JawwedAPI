@@ -72,6 +72,8 @@ public class Program
         //     await TafsirSeeding.SeedDataAsync(dbContext);
         // }
 
+
+
         // app.MapGet("/", async () => await app.SeedData());
 
         app.Run();
