@@ -11,6 +11,7 @@ using JawwedAPI.Infrastructure.DataSeeding;
 using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
 using JawwedAPI.Infrastructure.DbContexts;
 using JawwedAPI.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,13 @@ public static class AppServicesExtensions
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
+            .AddCookie(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                options =>
+                {
+                    options.Cookie.Name = "JawwedAuthCookie";
+                }
+            )
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new()
@@ -60,6 +68,15 @@ public static class AppServicesExtensions
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1),
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["JawwedAuthCookie"];
+                        return Task.CompletedTask;
+                    },
                 };
             });
 

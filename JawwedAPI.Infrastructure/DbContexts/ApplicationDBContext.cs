@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Verse> Verses { get; set; }
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<Line> Lines { get; set; }
+
     public DbSet<Bookmark> Bookmarks { get; set; }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<Mofasir> Mofasirs { get; set; }
@@ -39,12 +40,18 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
             .Entity<ApplicationUser>()
             .HasData(
                 [
-                    new() { Email = "thecityhunterhd@gmail.com", UserName = "Ahmad Mahfouz" },
+                    new()
+                    {
+                        Email = "thecityhunterhd@gmail.com",
+                        UserName = "Ahmad Mahfouz",
+                        UserId = Guid.Parse("b4f2b556-8789-4db3-b4b1-e0222f49a8e6"),
+                    },
                     new()
                     {
                         Email = "ahmad.mhfz1412@gmail.com",
                         UserName = "Ahmad Mahfouz",
                         UserRole = ApplicationRoles.Premium,
+                        UserId = Guid.Parse("18e83293-3400-447c-b38b-e7e9c62bf220"),
                     },
                 ]
             );

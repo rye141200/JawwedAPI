@@ -16,6 +16,11 @@ public interface IGenericRepository<T>
     Task<T?> GetOne(int id);
 
     /// <summary>
+    /// Gets a single entity by its ID. Returns null if not found.
+    /// </summary>
+    Task<T?> GetOne(Guid id);
+
+    /// <summary>
     /// Updates an existing entity.
     /// </summary>
     void Update(T entity);

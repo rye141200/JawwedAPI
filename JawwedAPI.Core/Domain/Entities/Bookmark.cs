@@ -12,9 +12,6 @@ public class Bookmark
     [Key]
     public int BookmarkId { get; set; }
 
-    [Required]
-    public int UserId { get; set; }
-
     /// <summary>
     ///the verse key associated with the bookmark.
     /// Ex: 1:2 , 2:4 verse:chapter
@@ -24,4 +21,9 @@ public class Bookmark
     public string? Page { get; set; }
 
     //! navigational property
+    [Required]
+    public Guid UserId { get; set; }
+
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser? ApplicationUser { get; set; }
 }

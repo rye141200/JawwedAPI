@@ -4,6 +4,7 @@ using JawwedAPI.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JawwedAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250413183333_DeleteBookmarkTable")]
+    partial class DeleteBookmarkTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,33 +64,6 @@ namespace JawwedAPI.Infrastructure.Migrations
                             UserName = "Ahmad Mahfouz",
                             UserRole = 1
                         });
-                });
-
-            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Bookmark", b =>
-                {
-                    b.Property<int>("BookmarkId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookmarkId"));
-
-                    b.Property<string>("Page")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Verse")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VerseKey")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("BookmarkId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Bookmarks");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Chapter", b =>
@@ -284,17 +260,6 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.HasKey("ZekrID");
 
                     b.ToTable("Azkar");
-                });
-
-            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Bookmark", b =>
-                {
-                    b.HasOne("JawwedAPI.Core.Domain.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Tafsir", b =>

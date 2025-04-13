@@ -72,5 +72,6 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         Expression<Func<T, object>> includeExpression
     ) => await context.Set<T>().Include(includeExpression).FirstOrDefaultAsync(predicate);
 
+    public async Task<T?> GetOne(Guid id) => await context.Set<T>().FindAsync(id);
     //$@"EXEC {procedureName} @{procedureParameterName} = {pageNumber}"
 }

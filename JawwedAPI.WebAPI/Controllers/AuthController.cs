@@ -2,13 +2,16 @@ using System.Security.Claims;
 using Google.Apis.Auth;
 using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.Exceptions.CustomExceptions;
+using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace JawwedAPI.WebAPI.Controllers;
 
-public class AuthController(IAuthService authService) : CustomBaseController
+public class AuthController(IAuthService authService, IOptions<JwtOptions> options)
+    : CustomBaseController
 {
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
@@ -17,6 +20,17 @@ public class AuthController(IAuthService authService) : CustomBaseController
         try
         {
             response = await authService.GoogleLogin(request);
+            HttpContext.Response.Cookies.Append(
+                "JawwedAuthCookie",
+                response.Token,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(options.Value.ExpirationMinutes),
+                }
+            );
         }
         catch (Exception ex)
         {
