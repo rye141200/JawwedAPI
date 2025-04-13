@@ -8,9 +8,26 @@ public class Mofasir
     [Key]
     public int MofasirID { get; set; }
 
-    public string? BookName { get; set; }
-    public string? AuthorName { get; set; }
+    // Book name in both languages
+    public string? BookNameArabic { get; set; }
+    public string? BookNameEnglish { get; set; }
 
-    public string? Languages { get; set; }
+    // Author name in both languages
+    public string? AuthorNameArabic { get; set; }
+    public string? AuthorNameEnglish { get; set; }
+
+    // Language support flags
+    public bool SupportsArabic { get; set; } = true;
+    public bool SupportsEnglish { get; set; } = false;
+
+    // Optional: Birth/Death dates for the scholar
+    public string? BirthYear { get; set; }
+    public string? DeathYear { get; set; }
+
+    // Optional: Brief biography in both languages
+    public string? BiographyArabic { get; set; }
+    public string? BiographyEnglish { get; set; }
+
+    // Navigation property
     public virtual List<Tafsir> Tafsirs { get; set; } = new List<Tafsir>();
 }

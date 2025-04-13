@@ -179,14 +179,35 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MofasirID"));
 
-                    b.Property<string>("AuthorName")
+                    b.Property<string>("AuthorNameArabic")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BookName")
+                    b.Property<string>("AuthorNameEnglish")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Languages")
+                    b.Property<string>("BiographyArabic")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BiographyEnglish")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BirthYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BookNameArabic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BookNameEnglish")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeathYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SupportsArabic")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SupportsEnglish")
+                        .HasColumnType("bit");
 
                     b.HasKey("MofasirID");
 
