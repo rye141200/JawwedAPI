@@ -37,4 +37,3 @@ jobs:
           server-username: ${{ secrets.SERVER_USERNAME }}
           server-password: ${{ secrets.SERVER_PASSWORD }}
           source-path: ./publish  # Path to the published files
-          skip-app-offline: false # Ensures the app is taken offline during deployment
