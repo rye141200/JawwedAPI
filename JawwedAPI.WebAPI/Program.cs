@@ -54,7 +54,7 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
-        app.Map("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
+        app.Map("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
         // app.MapGet("/", async () => await app.SeedData());
 
         // app.MapGet("/quiz/seed", async () => await app.SeedData());
