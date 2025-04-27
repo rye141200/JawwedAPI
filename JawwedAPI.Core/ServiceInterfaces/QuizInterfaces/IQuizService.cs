@@ -7,4 +7,6 @@ namespace JawwedAPI.Core.ServiceInterfaces.QuizInterfaces;
 public interface IQuizService
 {
     Task<List<QuestionResponse>> GenerateQuizQuestions();
+    Task<(int, int)> EvaluateQuizScoreAsync(List<QuestionSubmitRequest> submittedQuestions);
+    Task<QuizSubmitRequest> Cheat(QuizResponse quizResponse);
 }

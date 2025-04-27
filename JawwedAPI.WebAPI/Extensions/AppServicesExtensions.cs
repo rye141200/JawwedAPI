@@ -7,6 +7,7 @@ using JawwedAPI.Core.ServiceInterfaces.QuizInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
+using JawwedAPI.Core.ServiceInterfaces.UserInterfaces;
 using JawwedAPI.Core.Services;
 using JawwedAPI.Infrastructure.DataSeeding;
 using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
@@ -166,6 +167,8 @@ public static class AppServicesExtensions
         services.AddProblemDetails();
 
         services.AddScoped<IQuizService, QuizService>();
+        services.AddScoped<IUserService, UserService>();
+
         return services;
     }
 }

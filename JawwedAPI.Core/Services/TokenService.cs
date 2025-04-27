@@ -2,8 +2,10 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using JawwedAPI.Core.Exceptions.CustomExceptions;
 using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,6 +14,50 @@ namespace JawwedAPI.Core.Services;
 //TODO Refactor to make encapsulate common logic
 public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
 {
+    private readonly SymmetricSecurityKey securityKey =
+        new(Encoding.ASCII.GetBytes(jwtOptions.Value.Key));
+
+    public async Task<string?> ExtractClaimFromToken(string token, string claimType)
+    {
+        var securityTokenHandler = new JwtSecurityTokenHandler();
+        if (!securityTokenHandler.CanReadToken(token))
+            throw new GlobalErrorThrower(400, "Token is invalid JWT");
+        var result = await securityTokenHandler.ValidateTokenAsync(
+            token,
+            new()
+            {
+                IssuerSigningKey = securityKey,
+                ValidateLifetime = false,
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+            }
+        );
+        if (!result.IsValid)
+            throw new GlobalErrorThrower(401, "Token malformed");
+
+        return result.ClaimsIdentity.Claims.FirstOrDefault(claim => claim.Type == claimType)?.Value;
+    }
+
+    public async Task<bool> IsValidQuizSessionToken(string token)
+    {
+        var securityTokenHandler = new JwtSecurityTokenHandler();
+        if (!securityTokenHandler.CanReadToken(token))
+            return false;
+        var result = await securityTokenHandler.ValidateTokenAsync(
+            token,
+            new()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = securityKey,
+                ValidateLifetime = true,
+                ValidateAudience = false,
+                ValidateIssuer = false,
+            }
+        );
+        return result.IsValid;
+    }
+
     public string GenerateQuizSessionToken(string email, long expirationMinutes)
     {
         //!1) Config extraction

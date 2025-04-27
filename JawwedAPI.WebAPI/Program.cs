@@ -2,6 +2,7 @@ using System.Diagnostics;
 using JawwedAPI.WebAPI.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 namespace JawwedAPI.WebAPI;
 
@@ -24,25 +25,7 @@ public class Program
 
         builder.Services.AddServices(builder.Configuration);
 
-        // Add Swagger configuration
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc(
-                "v1",
-                new OpenApiInfo
-                {
-                    Title = "Jawwed API",
-                    Version = "v1",
-                    Description = "API for Quran Jawwed Application",
-                }
-            );
-
-            // Enable XML comments
-            /* var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            c.IncludeXmlComments(xmlPath); */
-        });
+        builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
@@ -52,11 +35,18 @@ public class Program
             app.UseExceptionHandler(options => { });
         }
         // Enable Swagger middleware
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        app.MapOpenApi();
+
+        app.MapScalarApiReference(options =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jawwed API V1");
+            options
+                .WithTitle("Jawwed API Documentation")
+                .WithTheme(ScalarTheme.BluePlanet)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+                .WithOpenApiRoutePattern("/openapi/v1.json")
+                .WithFavicon("/favicon-256.png");
         });
+
         app.UseStaticFiles();
         app.UseCors();
         app.UseRouting();
@@ -64,13 +54,7 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        //     await TafsirSeeding.SeedDataAsync(dbContext);
-        // }
-
-
+        app.Map("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
         // app.MapGet("/", async () => await app.SeedData());
 
         // app.MapGet("/quiz/seed", async () => await app.SeedData());

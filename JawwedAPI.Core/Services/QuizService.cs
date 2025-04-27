@@ -14,6 +14,7 @@ public class QuizService(
 {
     private const string QuestionsCacheKey = "quiz:all_questions";
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(24);
+    private const int totalScore = 12;
 
     public async Task<List<QuestionResponse>> GenerateQuizQuestions()
     {
@@ -40,6 +41,51 @@ public class QuizService(
 
         //!2) Convert to QuestionResponse
         return [.. quizQuestions.Select(question => question.ToQuestionResponse())];
+    }
+
+    public async Task<(int, int)> EvaluateQuizScoreAsync(
+        List<QuestionSubmitRequest> submittedQuestions
+    )
+    {
+        var questions = await memoryCacheService.GetOrCreateAsync<List<Question>>(
+            QuestionsCacheKey,
+            async () => [.. await questionsRepository.GetAll()],
+            CacheDuration
+        );
+        int score = 0;
+        submittedQuestions.ForEach(submittedQuestion =>
+        {
+            var currentQuestion = questions.FirstOrDefault(question =>
+                question.QuestionHeader == submittedQuestion.QuestionHeader
+            );
+
+            if (submittedQuestion.QuestionAnswer == currentQuestion?.Answer)
+                score++;
+        });
+        return (score, totalScore);
+    }
+
+    public async Task<QuizSubmitRequest> Cheat(QuizResponse quizResponse)
+    {
+        var questions = await memoryCacheService.GetOrCreateAsync<List<Question>>(
+            QuestionsCacheKey,
+            async () => [.. await questionsRepository.GetAll()],
+            CacheDuration
+        );
+        return new()
+        {
+            QuizSessionID = quizResponse.QuizSessionID,
+            AnsweredQuestions =
+            [
+                .. quizResponse.Questions.Select(question => new QuestionSubmitRequest()
+                {
+                    QuestionAnswer = questions
+                        .FirstOrDefault(q => q.QuestionID == question.QuestionID)
+                        ?.Answer!,
+                    QuestionHeader = question.QuestionHeader,
+                }),
+            ],
+        };
     }
 
     List<Question> SelectRandomQuestions(List<Question> questions, int count, Random random)
