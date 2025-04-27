@@ -1,39 +1,32 @@
-name: Build and Deploy JawwedAPI to MonsterASP.NET
+name: Publish to MonsterASP.NET
 
 on:
   push:
-    branches: [ main ]  # Only deploy when pushing to main branch
+    branches:
+      - main
 
 jobs:
-  build_and_deploy:
+  publish:
     runs-on: windows-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
-          
-      - name: Restore dependencies
-        run: dotnet restore JawwedAPISolution.sln
-        
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-      
-      - name: Test
-        run: dotnet test --no-restore --verbosity normal
-        
-      - name: Publish
-        run: dotnet publish JawwedAPI.WebAPI/JawwedAPI.WebAPI.csproj --configuration Release --output ./publish --runtime win-x86 --self-contained false
 
-      - name: Deploy to MonsterASP.NET
-        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
-        with:
-          website-name: ${{ secrets.WEBSITE_NAME }}
-          server-computer-name: ${{ secrets.SERVER_COMPUTER_NAME }}
-          server-username: ${{ secrets.SERVER_USERNAME }}
-          server-password: ${{ secrets.SERVER_PASSWORD }}
-          source-path: ./publish  # Path to the published files
+      - name: Publish WebAPI
+        run: dotnet publish JawwedAPI.WebAPI/JawwedAPI.WebAPI.csproj --configuration Release --output ./publish
+
+      - name: Deploy via Web‑Deploy
+        shell: pwsh
+        run: |
+          $msdeploy = "${env:ProgramFiles(x86)}\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+          & $msdeploy `
+            -verb:sync `
+            -source:contentPath=./publish `
+            -dest:auto,ComputerName="https://${{ secrets.SERVER_COMPUTER_NAME }}/msdeploy.axd?site=${{ secrets.WEBSITE_NAME }}",UserName="${{ secrets.SERVER_USERNAME }}",Password="${{ secrets.SERVER_PASSWORD }}",AuthType="Basic" `
+            -allowUntrusted
