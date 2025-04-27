@@ -1,0 +1,32 @@
+name: Publish to MonsterASP.NET
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish WebAPI
+        run: dotnet publish JawwedAPI.WebAPI/JawwedAPI.WebAPI.csproj --configuration Release --output ./publish
+
+      - name: Deploy via Web‑Deploy
+        shell: pwsh
+        run: |
+          $msdeploy = "${env:ProgramFiles(x86)}\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+          & $msdeploy `
+            -verb:sync `
+            -source:contentPath=./publish `
+            -dest:auto,ComputerName="https://${{ secrets.SERVER_COMPUTER_NAME }}/msdeploy.axd?site=${{ secrets.WEBSITE_NAME }}",UserName="${{ secrets.SERVER_USERNAME }}",Password="${{ secrets.SERVER_PASSWORD }}",AuthType="Basic" `
+            -allowUntrusted
