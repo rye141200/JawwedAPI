@@ -1,0 +1,40 @@
+name: Build and Deploy JawwedAPI to MonsterASP.NET
+
+on:
+  push:
+    branches: [ main ]  # Only deploy when pushing to main branch
+
+jobs:
+  build_and_deploy:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+          
+      - name: Restore dependencies
+        run: dotnet restore JawwedAPISolution.sln
+        
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+        
+      - name: Publish
+        run: dotnet publish JawwedAPI.WebAPI/JawwedAPI.WebAPI.csproj --configuration Release --output ./publish --runtime win-x86 --self-contained false
+
+      - name: Deploy to MonsterASP.NET
+        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
+        with:
+          website-name: ${{ secrets.WEBSITE_NAME }}
+          server-computer-name: ${{ secrets.SERVER_COMPUTER_NAME }}
+          server-username: ${{ secrets.SERVER_USERNAME }}
+          server-password: ${{ secrets.SERVER_PASSWORD }}
+          source-path: ./publish  # Path to the published files
+          skip-app-offline: false # Ensures the app is taken offline during deployment
