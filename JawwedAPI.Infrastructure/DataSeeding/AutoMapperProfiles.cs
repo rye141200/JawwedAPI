@@ -39,6 +39,10 @@ public class AutoMapperProfiles : Profile
                 options => options.MapFrom(chapter => chapter.Pages)
             );
 
+        CreateMap<JsonQuestion, Question>()
+            .ForMember(dest => dest.OptionA, opt => opt.MapFrom(src => src.Options[0]))
+            .ForMember(dest => dest.OptionB, opt => opt.MapFrom(src => src.Options[1]));
+
         CreateMap<JsonChapter, Chapter>();
         CreateMap<JsonLine, Line>();
         CreateMap<JsonVerse, Verse>();

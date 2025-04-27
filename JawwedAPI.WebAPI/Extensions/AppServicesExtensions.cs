@@ -3,6 +3,7 @@ using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.Exceptions;
 using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
+using JawwedAPI.Core.ServiceInterfaces.QuizInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace JawwedAPI.WebAPI.Extensions;
 
@@ -104,6 +106,33 @@ public static class AppServicesExtensions
         return services;
     }
 
+    public static IServiceCollection AddCacheServices(
+        this IServiceCollection services,
+        IConfiguration config
+    )
+    {
+        /* services.AddStackExchangeRedisCache(options =>
+        {
+            options.ConfigurationOptions = new ConfigurationOptions
+            {
+                EndPoints =
+                {
+                    {
+                        config.GetConnectionString("Redis")!,
+                        int.Parse(config["RedisCredentials:Port"]!)
+                    },
+                },
+                Password = config["RedisCredentials:Password"],
+            };
+            options.InstanceName = "JawwedAPI:";
+        }); */
+
+
+        services.AddMemoryCache();
+        services.AddScoped<ICacheService, MemoryCacheService>();
+        return services;
+    }
+
     public static IServiceCollection AddAutoMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -135,6 +164,8 @@ public static class AppServicesExtensions
         );
         services.AddExceptionHandler<GlobalErrorHandler>();
         services.AddProblemDetails();
+
+        services.AddScoped<IQuizService, QuizService>();
         return services;
     }
 }

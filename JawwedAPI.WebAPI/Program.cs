@@ -1,10 +1,6 @@
-using System.Reflection;
-using JawwedAPI.Core.Domain.Entities;
-using JawwedAPI.Core.Helpers;
-using JawwedAPI.Infrastructure.DataSeeding;
-using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
-using JawwedAPI.Infrastructure.DbContexts;
+using System.Diagnostics;
 using JawwedAPI.WebAPI.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 
 namespace JawwedAPI.WebAPI;
@@ -23,7 +19,9 @@ public class Program
             .AddRepository()
             .AddAutoMapper()
             .AddAuthenticationAndAuthorization(builder.Configuration)
-            .AddCorsPolicy();
+            .AddCorsPolicy()
+            .AddCacheServices(builder.Configuration);
+
         builder.Services.AddServices(builder.Configuration);
 
         // Add Swagger configuration
@@ -73,9 +71,9 @@ public class Program
         // }
 
 
-
         // app.MapGet("/", async () => await app.SeedData());
 
+        // app.MapGet("/quiz/seed", async () => await app.SeedData());
         app.Run();
     }
 }

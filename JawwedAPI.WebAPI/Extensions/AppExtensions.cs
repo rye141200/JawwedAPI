@@ -22,11 +22,19 @@ public static class AppExtensions
             //var verseSeedService = scope.ServiceProvider.GetRequiredService<IGenericSeedService<JsonVerse, Verse>>();
             //await verseSeedService.SaveToDatabase(@"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\versesFlattenedPerPage.json");
 
-            var azkarSeedService = scope.ServiceProvider.GetRequiredService<
+            /* var azkarSeedService = scope.ServiceProvider.GetRequiredService<
                 IGenericSeedService<JsonZekr, Zekr>
             >();
             await azkarSeedService.SaveToDatabase(
                 @"D:\Study\ASU\GP\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\azkar.json"
+            ); */
+
+            var questionSeedService = scope.ServiceProvider.GetRequiredService<
+                IGenericSeedService<JsonQuestion, Question>
+            >();
+
+            await questionSeedService.SaveToDatabase(
+                @"E:\Senior 1 CSE\GP\GP-Backend\JawwedAPI\JawwedAPI.Infrastructure\DataSeeding\Assets\questions_bank.json"
             );
         }
     }

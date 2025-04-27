@@ -1,7 +1,9 @@
 using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
+using JawwedAPI.Infrastructure.DataSeeding;
 using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace JawwedAPI.Infrastructure.DbContexts;
 
@@ -16,6 +18,7 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Mofasir> Mofasirs { get; set; }
     public DbSet<Tafsir> Tafsirs { get; set; }
     public DbSet<Zekr> Azkar { get; set; }
+    public DbSet<Question> Questions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,6 +58,9 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
                     },
                 ]
             );
+
+        modelBuilder.Entity<Question>().Property(q => q.QuestionID).UseIdentityColumn();
+
         /* modelBuilder.Entity<Verse>()
         .HasOne<Line>()
         .WithMany(l => l.Verses)
