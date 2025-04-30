@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JawwedAPI.WebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class MofasirController(IMapper mapper, IMofasirService mofasirService) : ControllerBase
+    public class MofasirController(IMapper mapper, IMofasirService mofasirService)
+        : CustomBaseController
     {
         /// <summary>
         /// Gets mofasir information - returns a specific mofasir if ID is provided, otherwise returns all mofasirs

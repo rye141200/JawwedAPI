@@ -122,6 +122,7 @@ public static class AppServicesExtensions
     )
     {
         services.AddScoped<IBookmarkServices, BookmarkServices>();
+        services.AddScoped<IGoalsService, GoalsService>();
         services.AddScoped<IMushafServices, MushafServices>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();

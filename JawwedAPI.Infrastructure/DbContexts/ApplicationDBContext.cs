@@ -16,6 +16,7 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Mofasir> Mofasirs { get; set; }
     public DbSet<Tafsir> Tafsirs { get; set; }
     public DbSet<Zekr> Azkar { get; set; }
+    public DbSet<Goal> Goals { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,7 +59,12 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
         /* modelBuilder.Entity<Verse>()
         .HasOne<Line>()
         .WithMany(l => l.Verses)
-        .HasForeignKey("LineID")
+        .HasFoeignKey("LineID")
         .OnDelete(DeleteBehavior.ClientSetNull); */
+        modelBuilder
+            .Entity<ApplicationUser>()
+            .HasMany(user => user.Goals)
+            .WithOne(goal => goal.User)
+            .HasForeignKey(goal => goal.UserId);
     }
 }

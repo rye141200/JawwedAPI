@@ -126,6 +126,47 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.ToTable("Chapters");
                 });
 
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Goal", b =>
+                {
+                    b.Property<Guid>("GoalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ActualPagesRead")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DurationDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastVerseKeyRead")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StartPage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalPages")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GoalId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Goals");
+                });
+
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Line", b =>
                 {
                     b.Property<int>("LineID")
@@ -318,6 +359,17 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Goal", b =>
+                {
+                    b.HasOne("JawwedAPI.Core.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("Goals")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Tafsir", b =>
                 {
                     b.HasOne("JawwedAPI.Core.Domain.Entities.Mofasir", "Mofasir")
@@ -338,6 +390,11 @@ namespace JawwedAPI.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Chapter");
+                });
+
+            modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("Goals");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Chapter", b =>

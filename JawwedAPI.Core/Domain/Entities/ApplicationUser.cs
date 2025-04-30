@@ -15,6 +15,7 @@ public class ApplicationUser
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
 
+    public ICollection<Goal> Goals { get; set; } = new List<Goal>();
     public ApplicationRoles UserRole { get; set; } = ApplicationRoles.Basic;
 }
 
