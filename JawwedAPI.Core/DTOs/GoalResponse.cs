@@ -1,4 +1,3 @@
-using AutoMapper.Configuration.Annotations;
 using JawwedAPI.Core.DTOs;
 
 public class GoalResponse
@@ -15,7 +14,8 @@ public class GoalResponse
     public int StartPage { get; init; }
     public int EndPage => StartPage + TotalPages - 1;
     public string LastVerseKeyRead { get; set; } = string.Empty;
-    public string Status { get; init; }
+    public string Status { get; set; }
+    public TimeSpan ReminderTime { get; set; }
 
     public List<ReadingSessionResponse> ReadingSchedule { get; set; } =
         new List<ReadingSessionResponse>();

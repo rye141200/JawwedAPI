@@ -1,11 +1,8 @@
-using System.Reflection;
-using JawwedAPI.Core.Domain.Entities;
-using JawwedAPI.Core.Helpers;
-using JawwedAPI.Infrastructure.DataSeeding;
-using JawwedAPI.Infrastructure.DataSeeding.JsonBindedClasses;
-using JawwedAPI.Infrastructure.DbContexts;
+using Hangfire;
+using JawwedAPI.Core.Jobs;
 using JawwedAPI.WebAPI.Extensions;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 namespace JawwedAPI.WebAPI;
 
@@ -26,38 +23,28 @@ public class Program
             .AddCorsPolicy();
         builder.Services.AddServices(builder.Configuration);
 
-        // Add Swagger configuration
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc(
-                "v1",
-                new OpenApiInfo
-                {
-                    Title = "Jawwed API",
-                    Version = "v1",
-                    Description = "API for Quran Jawwed Application",
-                }
-            );
-
-            // Enable XML comments
-            /* var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            c.IncludeXmlComments(xmlPath); */
-        });
+        builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
         // Configure middleware pipeline
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler(options => { });
+            app.UseExceptionHandler(configure: options => { });
         }
+
         // Enable Swagger middleware
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        app.MapOpenApi();
+
+        app.MapScalarApiReference(options =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jawwed API V1");
+            options
+                .WithTitle("Jawwed API Documentation")
+                .WithTheme(ScalarTheme.BluePlanet)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+                .WithOpenApiRoutePattern("/openapi/v1.json")
+                .WithLayout(ScalarLayout.Classic)
+                .WithFavicon("/favicon-256.png");
         });
         app.UseStaticFiles();
         app.UseCors();
@@ -72,10 +59,14 @@ public class Program
         //     await TafsirSeeding.SeedDataAsync(dbContext);
         // }
 
-
-
+        app.Map("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
         // app.MapGet("/", async () => await app.SeedData());
-
+        app.UseHangfireDashboard();
+        RecurringJob.AddOrUpdate<PushNotificationJob>(
+            "DailyReadingNotifications",
+            svc => svc.CheckAndNotifyAllUsersAsync(CancellationToken.None),
+            Cron.Daily
+        );
         app.Run();
     }
 }

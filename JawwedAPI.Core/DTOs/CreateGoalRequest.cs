@@ -1,11 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace JawwedAPI.Core.DTOs;
 
 public class CreateGoalRequest
 {
-    public Guid UserId { get; set; }
+    [BindNever]
+    public Guid? UserId { get; set; }
 
     [Required(ErrorMessage = "title not found")]
     public string Title { get; set; }
@@ -18,4 +20,7 @@ public class CreateGoalRequest
 
     [Required(ErrorMessage = "start page not found")]
     public int StartPage { get; set; }
+
+    [Required(ErrorMessage = "Remainder time not found")]
+    public TimeSpan ReminderTime { get; set; }
 }

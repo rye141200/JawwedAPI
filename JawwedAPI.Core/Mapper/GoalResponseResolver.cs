@@ -67,7 +67,7 @@ public class GoalResponseResolver : IValueResolver<Goal, GoalResponse, List<Read
                 session.Status = ReadingSessionStatus.InProgress.ToString();
                 session.ActualPagesRead = inProgressPages;
             }
-            else if (scheduledDate.Date < DateTime.Today.AddDays(3.0))
+            else if (scheduledDate.Date < DateTime.Today)
             {
                 session.Status = ReadingSessionStatus.Missed.ToString();
             }

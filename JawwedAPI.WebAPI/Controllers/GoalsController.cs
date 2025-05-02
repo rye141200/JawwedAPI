@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using JawwedAPI.Core.Domain.Entities;
+using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.DTOs;
+using JawwedAPI.Core.ServiceInterfaces.NotificationInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace JawwedAPI.WebAPI.Controllers;
 
 [Authorize]
-public class GoalsController(IGoalsService goalsService) : CustomBaseController
+public class GoalsController(IGoalsService goalsService, INotificationService notificationService)
+    : CustomBaseController
 {
     [HttpPost]
     public async Task<IActionResult> CreateGoal(CreateGoalRequest createGoalRequest)
@@ -43,9 +46,21 @@ public class GoalsController(IGoalsService goalsService) : CustomBaseController
     {
         string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        return Ok(
-            await goalsService.UpdateGoalAsync(updateGoalRequest, goalId, Guid.Parse(userId))
+        var goalResponse = await goalsService.UpdateGoalAsync(
+            updateGoalRequest,
+            goalId,
+            Guid.Parse(userId)
         );
+        var completedSessions = goalResponse
+            .ReadingSchedule.Where(s => s.Status == ReadingSessionStatus.Completed.ToString())
+            .ToList();
+
+        await notificationService.DeleteScheduledJobs(
+            Guid.Parse(userId),
+            goalId,
+            completedSessions
+        );
+        return Ok();
     }
 
     [HttpDelete("{goalId}")]
@@ -53,6 +68,12 @@ public class GoalsController(IGoalsService goalsService) : CustomBaseController
     {
         string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         await goalsService.DeleteGoalAsync(goalId, Guid.Parse(userId));
+        var goalResponse = await goalsService.GetGoalByIdAsync(goalId, Guid.Parse(userId));
+        await notificationService.DeleteScheduledJobs(
+            Guid.Parse(userId),
+            goalId,
+            goalResponse.ReadingSchedule
+        );
         return Ok();
     }
 }

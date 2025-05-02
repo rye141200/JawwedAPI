@@ -2,119 +2,193 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Google Sign-In Test</title>
-    <script src="https://accounts.google.com/gsi/client" async></script>
-  </head>
-  <body>
-    <h1>Google Sign-In Test</h1>
+    <title>JawwedAPI – Google Sign‑In & FCM Test</title>
 
-    <!-- Updated Google Sign-In button with prompt=login parameter -->
-    <div
-      id="g_id_onload"
-      data-client_id="17494011183-fmimqr7mgrrfubd6vsmdbd7vuejsae2l.apps.googleusercontent.com"
-      data-callback="handleCredentialResponse"
-      data-prompt_parent_id="g_id_onload"
-      data-auto_prompt="false"
-      data-prompt="login"
-      <!--
-      This
-      forces
-      a
-      new
-      login
-      every
-      time
-      --
-    ></div>
+    <!-- 1) Firebase App + Messaging (modular SDK) -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import {
+        getMessaging,
+        getToken,
+        deleteToken,
+        onMessage,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
 
-    <div
-      class="g_id_signin"
-      data-type="standard"
-      data-size="large"
-      data-theme="outline"
-      data-text="sign_in_with"
-      data-shape="rectangular"
-      data-logo_alignment="left"
-    ></div>
+      // Your Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyBbjNlOAgXxIXry6oZD5n-OfafQg6z3fWw",
+        authDomain: "jawwedapi-2cfdf.firebaseapp.com",
+        projectId: "jawwedapi-2cfdf",
+        storageBucket: "jawwedapi-2cfdf.appspot.com",
+        messagingSenderId: "151202375322",
+        appId: "1:151202375322:web:44f83f842a6c051efce123",
+        measurementId: "G-B2NSFY1Y5Y",
+      };
 
-    <pre
-      id="token-display"
-      style="
-        margin-top: 20px;
-        padding: 10px;
-        background-color: #f5f5f5;
-        word-wrap: break-word;
-      "
-    ></pre>
-    <button
-      id="copy-button"
-      style="display: none; margin-top: 10px"
-      onclick="copyToken()"
-    >
-      Copy Token
-    </button>
-    <button id="logout-button" style="margin-top: 10px" onclick="signOut()">
-      Sign Out
-    </button>
+      // Init
+      const app = initializeApp(firebaseConfig);
+      const messaging = getMessaging(app);
 
+      const VAPID_KEY =
+        "BDKj2Dvd36Hee8FlqJq52wp4suc0IikCSMMZRzzwZE6iAHkLfJzwdAgJIJs6OmBqiwuYb4hv2aRWK-rlqWealqM";
+
+      // Register service worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/firebase-messaging-sw.js")
+          .then(() => console.log("FCM SW registered"))
+          .catch(console.error);
+      }
+
+      // Ask permission & fetch token
+      async function registerFCMToken() {
+        const status = await Notification.requestPermission();
+        if (status !== "granted") {
+          console.warn("Notifications permission:", status);
+          return;
+        }
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_KEY,
+        });
+        console.log("FCM token:", token);
+
+        // send to your API
+        await fetch("/api/notification/register-device", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deviceToken: token }),
+        });
+        console.log("Device token registered on server");
+      }
+
+      async function refreshFCMToken() {
+        try {
+          // 1) get (and log) the current token
+          const current = await getToken(messaging, { vapidKey: VAPID_KEY });
+          console.log("Current token:", current);
+
+          // 2) delete it
+          const deleted = await deleteToken(messaging);
+          console.log("Token deleted?", deleted);
+
+          // 3) now request a brand‐new one
+          const newToken = await getToken(messaging, {
+            vapidKey: VAPID_KEY,
+            forceRefresh: true,
+          });
+          console.log("New token:", newToken);
+
+          // 4) send it to your API
+          await fetch("/api/notification/register-device", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ deviceToken: newToken }),
+          });
+          console.log("Refreshed token sent to server");
+        } catch (err) {
+          console.error("refreshFCMToken error:", err);
+        }
+      }
+
+      // expose refreshFCMToken to window
+      window.refreshFCMToken = refreshFCMToken;
+
+      // handle incoming foreground messages
+      onMessage(messaging, (payload) => {
+        console.log("FCM foreground message:", payload);
+      });
+
+      // listen for SW messages in case of pushsubscriptionchange
+      navigator.serviceWorker.addEventListener("message", (evt) => {
+        if (evt.data === "REFRESH_FCM_TOKEN") {
+          refreshFCMToken();
+        }
+      });
+
+      // wait for SW then register token
+      navigator.serviceWorker.ready.then(registerFCMToken);
+    </script>
+
+    <!-- 2) Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
       function handleCredentialResponse(response) {
-        // Display the ID token
+        // show the ID token
         document.getElementById("token-display").textContent =
           response.credential;
-        document.getElementById("copy-button").style.display = "block";
-        console.log("ID Token: ", response.credential);
+        document.getElementById("copy-button").style.display = "inline-block";
+        console.log("Google ID token:", response.credential);
 
-        // Store token info for verification
-        const tokenParts = response.credential.split(".");
-        if (tokenParts.length >= 2) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          console.log(
-            "Token expires at: ",
-            new Date(payload.exp * 1000).toLocaleString()
-          );
-          console.log(
-            "Token issued at: ",
-            new Date(payload.iat * 1000).toLocaleString()
-          );
+        // decode payload
+        const parts = response.credential.split(".");
+        if (parts.length > 1) {
+          const payload = JSON.parse(atob(parts[1]));
+          console.log("Expires:", new Date(payload.exp * 1000));
+          console.log("Issued:", new Date(payload.iat * 1000));
         }
       }
 
       function copyToken() {
-        const tokenText = document.getElementById("token-display").textContent;
+        const txt = document.getElementById("token-display").textContent;
         navigator.clipboard
-          .writeText(tokenText)
-          .then(() => alert("Token copied to clipboard"))
-          .catch((err) => console.error("Failed to copy: ", err));
+          .writeText(txt)
+          .then(() => alert("Token copied"))
+          .catch(console.error);
       }
 
       function signOut() {
-        // Clear any Google auth state
         google.accounts.id.disableAutoSelect();
-
-        // Clear token display
         document.getElementById("token-display").textContent = "";
         document.getElementById("copy-button").style.display = "none";
-
-        // Clear cookies for Google domains
-        document.cookie.split(";").forEach(function (c) {
-          if (c.trim().startsWith("g_")) {
-            document.cookie = c
-              .replace(/^ +/, "")
-              .replace(
-                /=.*/,
-                "=;expires=" + new Date().toUTCString() + ";path=/"
-              );
-          }
-        });
-
-        alert("Signed out. You can now get a new token.");
-
-        // Reload the page to ensure a clean state
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        alert("Signed out. Refresh to sign in again.");
       }
+
+      // render the button after GSI loads
+      window.onload = () => {
+        google.accounts.id.initialize({
+          client_id:
+            "17494011183-fmimqr7mgrrfubd6vsmdbd7vuejsae2l.apps.googleusercontent.com",
+          callback: handleCredentialResponse,
+          prompt_parent_id: "g_id_onload",
+          auto_select: false,
+          prompt: "login",
+        });
+        google.accounts.id.renderButton(
+          document.getElementById("g_id_signin"),
+          { theme: "outline", size: "large" }
+        );
+      };
     </script>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 1rem;
+      }
+      pre {
+        background: #f5f5f5;
+        padding: 0.5rem;
+      }
+      button {
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>JawwedAPI – Google Sign‑In & FCM Test</h1>
+
+    <!-- Google Sign‑In -->
+    <div id="g_id_onload"></div>
+    <div id="g_id_signin"></div>
+
+    <pre id="token-display" style="display: block; margin-top: 1rem"></pre>
+    <button id="copy-button" style="display: none" onclick="copyToken()">
+      Copy Token
+    </button>
+    <button id="logout-button" onclick="signOut()">Sign Out</button>
+    <button onclick="refreshFCMToken()" style="margin-top: 10px">
+      Refresh FCM Token
+    </button>
   </body>
 </html>

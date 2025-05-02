@@ -1,8 +1,15 @@
+using System.Text.Json;
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
+using Hangfire;
 using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.Exceptions;
+using JawwedAPI.Core.Jobs;
 using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
+using JawwedAPI.Core.ServiceInterfaces.NotificationInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
@@ -15,6 +22,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace JawwedAPI.WebAPI.Extensions;
@@ -136,6 +144,34 @@ public static class AppServicesExtensions
         );
         services.AddExceptionHandler<GlobalErrorHandler>();
         services.AddProblemDetails();
+        services.AddHangfire(
+            (sp, globalConfig) =>
+            {
+                globalConfig.UseSqlServerStorage(config.GetConnectionString("DefaultConnection"));
+            }
+        );
+        services.AddHangfireServer();
+        services.AddSingleton(sp =>
+        {
+            var env = sp.GetRequiredService<IHostEnvironment>();
+            var credsPath = Path.Combine(env.ContentRootPath, "fireBaseCredits.json");
+
+            // Load the service‑account credential
+            var credential = GoogleCredential.FromFile(credsPath);
+
+            // Pull project_id from the same JSON
+            using var doc = JsonDocument.Parse(File.ReadAllText(credsPath));
+            var projectId = doc.RootElement.GetProperty("project_id").GetString()!;
+
+            // Create the FirebaseApp *with* both Credential AND ProjectId
+            var app = FirebaseApp.Create(
+                new AppOptions { Credential = credential, ProjectId = projectId }
+            );
+
+            return FirebaseMessaging.GetMessaging(app);
+        });
+        services.AddScoped<INotificationService, FcmNotificationService>();
+        services.AddScoped<PushNotificationJob>();
         return services;
     }
 }

@@ -14,7 +14,9 @@ public class ApplicationUser
     [Required(ErrorMessage = "Email is required!")]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
+    public bool EnableNotifications { get; set; } = false;
 
+    public string DeviceToken { get; set; } = string.Empty;
     public ICollection<Goal> Goals { get; set; } = new List<Goal>();
     public ApplicationRoles UserRole { get; set; } = ApplicationRoles.Basic;
 }

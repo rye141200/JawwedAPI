@@ -17,7 +17,7 @@ namespace JawwedAPI.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -28,9 +28,16 @@ namespace JawwedAPI.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("EnableNotifications")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(70)
@@ -50,14 +57,18 @@ namespace JawwedAPI.Infrastructure.Migrations
                         new
                         {
                             UserId = new Guid("b4f2b556-8789-4db3-b4b1-e0222f49a8e6"),
+                            DeviceToken = "",
                             Email = "thecityhunterhd@gmail.com",
+                            EnableNotifications = false,
                             UserName = "Ahmad Mahfouz",
                             UserRole = 0
                         },
                         new
                         {
                             UserId = new Guid("18e83293-3400-447c-b38b-e7e9c62bf220"),
+                            DeviceToken = "",
                             Email = "ahmad.mhfz1412@gmail.com",
+                            EnableNotifications = false,
                             UserName = "Ahmad Mahfouz",
                             UserRole = 1
                         });
@@ -140,6 +151,9 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<string>("LastVerseKeyRead")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeSpan>("ReminderTime")
+                        .HasColumnType("time");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -298,8 +312,7 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<int>("Page")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("Sajdah")
-                        .IsRequired()
+                    b.Property<bool>("Sajdah")
                         .HasColumnType("bit");
 
                     b.Property<string>("TextUthmani")
