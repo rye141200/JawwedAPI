@@ -1,5 +1,6 @@
 using AutoMapper;
 using JawwedAPI.Core.Domain.Entities;
+using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.Mapper;
 
@@ -38,6 +39,11 @@ public class AutoMapperProfiles : Profile
                 ChapterNumber => ChapterNumber.PagesRange,
                 options => options.MapFrom(chapter => chapter.Pages)
             );
+
+        CreateMap<Goal, GoalResponse>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.ReadingSchedule, opt => opt.MapFrom<GoalResponseResolver>());
+        CreateMap<CreateGoalRequest, Goal>();
 
         CreateMap<JsonQuestion, Question>()
             .ForMember(dest => dest.OptionA, opt => opt.MapFrom(src => src.Options[0]))

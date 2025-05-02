@@ -10,6 +10,7 @@ nupkg/
 
 #appsettings
 /JawwedAPI.WebAPI/appsettings.json
+/JawwedAPI.WebAPI/fireBaseCredits.json
 /JawwedAPI.WebAPI/appsettings.Development.json
 
 # Rider
