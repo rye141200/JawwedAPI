@@ -1,6 +1,6 @@
+using System.Diagnostics;
 using Hangfire;
 using JawwedAPI.Core.Jobs;
-using System.Diagnostics;
 using JawwedAPI.WebAPI.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
@@ -41,15 +41,11 @@ public class Program
 
         // Enable Swagger middleware
         app.MapOpenApi();
-
-        app.MapScalarApiReference(options =>
-        app.MapOpenApi();
-
         app.MapScalarApiReference(options =>
         {
             options
                 .WithTitle("Jawwed API Documentation")
-                .WithTheme(ScalarTheme.BluePlanet)
+                .WithTheme(ScalarTheme.DeepSpace)
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
                 .WithOpenApiRoutePattern("/openapi/v1.json")
                 .WithLayout(ScalarLayout.Classic)
@@ -70,9 +66,8 @@ public class Program
         // }
 
         app.Map("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
-        app.Map("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
         // app.MapGet("/", async () => await app.SeedData());
-        app.UseHangfireDashboard();
+        app.UseHangfireDashboard("/Hangfire");
         RecurringJob.AddOrUpdate<PushNotificationJob>(
             "DailyReadingNotifications",
             svc => svc.CheckAndNotifyAllUsersAsync(CancellationToken.None),
