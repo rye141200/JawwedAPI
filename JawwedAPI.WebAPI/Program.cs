@@ -45,10 +45,10 @@ public class Program
         {
             options
                 .WithTitle("Jawwed API Documentation")
-                .WithTheme(ScalarTheme.DeepSpace)
+                .WithTheme(ScalarTheme.BluePlanet)
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
                 .WithOpenApiRoutePattern("/openapi/v1.json")
-                .WithLayout(ScalarLayout.Classic)
+                .WithLayout(ScalarLayout.Modern)
                 .WithFavicon("/favicon-256.png");
         });
 

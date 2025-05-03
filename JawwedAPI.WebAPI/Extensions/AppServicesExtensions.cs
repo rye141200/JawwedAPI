@@ -10,6 +10,7 @@ using JawwedAPI.Core.Jobs;
 using JawwedAPI.Core.Options;
 using JawwedAPI.Core.ServiceInterfaces.AuthenticationInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.NotificationInterfaces;
+using JawwedAPI.Core.ServiceInterfaces.QuizInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.SeedInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.TokenInterfaces;
@@ -157,6 +158,7 @@ public static class AppServicesExtensions
         IConfiguration config
     )
     {
+        //!1) Custom Services
         services.AddScoped<IBookmarkServices, BookmarkServices>();
         services.AddScoped<IGoalsService, GoalsService>();
         services.AddScoped<IMushafServices, MushafServices>();
@@ -165,11 +167,17 @@ public static class AppServicesExtensions
         services.AddScoped<ITafsirService, TafsirService>();
         services.AddScoped<IMofasirService, MofasirService>();
         services.AddScoped<IAzkarService, AzkarService>();
+        services.AddScoped<IQuizService, QuizService>();
+        services.AddScoped<IUserService, UserService>();
+
+        //!2) Options pattern
         services.Configure<AudioAssetsOptions>(config.GetSection("AudioAssets"));
         services.Configure<JwtOptions>(config.GetSection("Authentication").GetSection("JWT"));
         services.Configure<GoogleAuthenticationOptions>(
             config.GetSection("Authentication").GetSection("Google")
         );
+
+        //!3) Error handler
         services.AddExceptionHandler<GlobalErrorHandler>();
         services.AddProblemDetails();
         services.AddHangfire(
