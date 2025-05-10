@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FirebaseAdmin.Messaging;
 using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
+using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.ServiceInterfaces.NotificationInterfaces;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +25,12 @@ public class NotificationController(
 {
     // register or refresh FCM token
     [HttpPost("register-device")]
-    public async Task<IActionResult> RegisterDeviceToken([FromBody] string deviceToken)
+    public async Task<IActionResult> RegisterDeviceToken(
+        [FromBody] RegisterDeviceRequest notificationRequest
+    )
     {
         // extract deviceToken
-        if (string.IsNullOrWhiteSpace(deviceToken))
+        if (string.IsNullOrWhiteSpace(notificationRequest.DeviceToken))
             return BadRequest("deviceToken is required.");
 
         // get userId from JWT
@@ -40,7 +43,7 @@ public class NotificationController(
         if (user is null)
             return NotFound("User not found");
 
-        user.DeviceToken = deviceToken;
+        user.DeviceToken = notificationRequest.DeviceToken;
         user.EnableNotifications = true;
 
         userRepo.Update(user);
