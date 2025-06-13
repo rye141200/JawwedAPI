@@ -14,7 +14,7 @@ public class VerseResponse
 
     public bool? Sajdah { get; set; }
 
-    public string? Text { get; set; }
+    public required string Text { get; set; }
 
     public int ChapterID { get; set; }
 

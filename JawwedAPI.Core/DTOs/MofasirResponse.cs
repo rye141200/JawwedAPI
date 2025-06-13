@@ -16,32 +16,32 @@ public class MofasirResponse
     /// <summary>
     /// The Arabic name of the scholar/author
     /// </summary>
-    public string AuthorNameArabic { get; set; } = string.Empty;
+    public required string AuthorNameArabic { get; set; }
 
     /// <summary>
     /// The English name of the scholar/author
     /// </summary>
-    public string AuthorNameEnglish { get; set; } = string.Empty;
+    public required string AuthorNameEnglish { get; set; }
 
     /// <summary>
     /// The Arabic title of the Tafsir book
     /// </summary>
-    public string BookNameArabic { get; set; } = string.Empty;
+    public required string BookNameArabic { get; set; }
 
     /// <summary>
     /// The English title of the Tafsir book
     /// </summary>
-    public string BookNameEnglish { get; set; } = string.Empty;
+    public required string BookNameEnglish { get; set; }
 
     /// <summary>
     /// Brief biography of the Mofasir in Arabic
     /// </summary>
-    public string BiographyArabic { get; set; } = string.Empty;
+    public required string BiographyArabic { get; set; }
 
     /// <summary>
     /// Brief biography of the Mofasir in English
     /// </summary>
-    public string BiographyEnglish { get; set; } = string.Empty;
+    public required string BiographyEnglish { get; set; }
 
     /// <summary>
     /// Whether this Mofasir's works are available in Arabic
@@ -56,10 +56,10 @@ public class MofasirResponse
     /// <summary>
     /// Birth year of the Mofasir
     /// </summary>
-    public string BirthYear { get; set; } = string.Empty;
+    public required string BirthYear { get; set; }
 
     /// <summary>
     /// Death year of the Mofasir
     /// </summary>
-    public string DeathYear { get; set; } = string.Empty;
+    public required string DeathYear { get; set; }
 }

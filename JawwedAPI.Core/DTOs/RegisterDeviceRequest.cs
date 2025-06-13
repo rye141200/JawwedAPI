@@ -2,5 +2,5 @@ namespace JawwedAPI.Core.DTOs;
 
 public class RegisterDeviceRequest
 {
-    public string DeviceToken { get; set; }
+    public required string DeviceToken { get; set; }
 }

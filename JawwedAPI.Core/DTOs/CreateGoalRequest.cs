@@ -10,7 +10,7 @@ public class CreateGoalRequest
     public Guid? UserId { get; set; }
 
     [Required(ErrorMessage = "title not found")]
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     [Required(ErrorMessage = "duration days not found")]
     public int DurationDays { get; set; }

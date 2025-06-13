@@ -192,19 +192,55 @@ public static class AppServicesExtensions
             var env = sp.GetRequiredService<IHostEnvironment>();
             var credsPath = Path.Combine(env.ContentRootPath, "fireBaseCredits.json");
 
-            // Load the service‑account credential
-            var credential = GoogleCredential.FromFile(credsPath);
+            if (!File.Exists(credsPath))
+            {
+                throw new FileNotFoundException(
+                    $"Firebase credentials file not found at {credsPath}. Please ensure the file exists and contains valid service account credentials."
+                );
+            }
 
-            // Pull project_id from the same JSON
-            using var doc = JsonDocument.Parse(File.ReadAllText(credsPath));
-            var projectId = doc.RootElement.GetProperty("project_id").GetString()!;
+            try
+            {
+                // Load the service‑account credential
+                var credential = GoogleCredential.FromFile(credsPath);
 
-            // Create the FirebaseApp *with* both Credential AND ProjectId
-            var app = FirebaseApp.Create(
-                new AppOptions { Credential = credential, ProjectId = projectId }
-            );
+                // Pull project_id from the same JSON
+                using var doc = JsonDocument.Parse(File.ReadAllText(credsPath));
+                var projectId = doc.RootElement.GetProperty("project_id").GetString();
 
-            return FirebaseMessaging.GetMessaging(app);
+                if (string.IsNullOrEmpty(projectId))
+                {
+                    throw new InvalidOperationException(
+                        "Project ID not found in Firebase credentials file."
+                    );
+                }
+
+                if (projectId != "jawwedapi-2cfdf")
+                {
+                    throw new InvalidOperationException(
+                        $"Project ID mismatch. Expected 'jawwedapi-2cfdf' but found '{projectId}'."
+                    );
+                }
+
+                // Create the FirebaseApp with both Credential AND ProjectId
+                var app = FirebaseApp.Create(
+                    new AppOptions
+                    {
+                        Credential = credential,
+                        ProjectId = projectId,
+                        ServiceAccountId = doc.RootElement.GetProperty("client_email").GetString(),
+                    }
+                );
+
+                return FirebaseMessaging.GetMessaging(app);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    "Failed to initialize Firebase. Please check your credentials file and ensure it's valid.",
+                    ex
+                );
+            }
         });
         services.AddScoped<INotificationService, FcmNotificationService>();
         services.AddScoped<PushNotificationJob>();

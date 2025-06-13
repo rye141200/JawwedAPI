@@ -7,5 +7,5 @@ public class UpdateGoalRequest
     public int LastPageRead { get; set; }
 
     [Required(ErrorMessage = "Last versekey read not found")]
-    public string LastVerseKeyRead { get; set; }
+    public required string LastVerseKeyRead { get; set; }
 }

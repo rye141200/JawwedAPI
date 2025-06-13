@@ -56,11 +56,12 @@ public class TafsirService(
             tafsir =>
                 tafsir.ChapterVerseID.StartsWith($"{Chapter}:")
                 && tafsir.MofasirID == Convert.ToInt32(mofasirID)
+                && tafsir.Mofasir != null
                 && (
                     (languageParam == "العربية" && tafsir.Mofasir.SupportsArabic)
                     || (languageParam == "English" && tafsir.Mofasir.SupportsEnglish)
                 ),
-            tafsir => tafsir.Mofasir,
+            tafsir => tafsir.Mofasir!,
             tafsir => new TafsirResponse
             {
                 ChapterVerseID = tafsir.ChapterVerseID,
@@ -122,8 +123,11 @@ public class TafsirService(
 
         //! 4) search for the needed tafasir in database
         Tafsir? tafsir = await TafsirRepository.FindOneAndPopulateAsync(
-            t => t.ChapterVerseID == ChapterVerseID && t.MofasirID == Convert.ToInt32(mofasirID),
-            t => t.Mofasir
+            t =>
+                t.ChapterVerseID == ChapterVerseID
+                && t.MofasirID == Convert.ToInt32(mofasirID)
+                && t.Mofasir != null,
+            t => t.Mofasir!
         );
 
         // Create response, even if tafsir is null

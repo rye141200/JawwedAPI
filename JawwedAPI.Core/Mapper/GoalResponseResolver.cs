@@ -43,7 +43,7 @@ public class GoalResponseResolver : IValueResolver<Goal, GoalResponse, List<Read
             else
                 endPage = startPage + pagesPerDay - 1;
 
-            DateTime scheduledDate = source.StartDate.AddDays(day - 1);
+            DateTimeOffset scheduledDate = source.StartDate.AddDays(day - 1);
 
             var session = new ReadingSessionResponse
             {

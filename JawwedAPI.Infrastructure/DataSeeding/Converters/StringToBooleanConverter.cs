@@ -6,17 +6,22 @@ namespace JawwedAPI.Infrastructure.DataSeeding.Converters;
 
 public class StringToBooleanConverter : JsonConverter<bool>
 {
-    public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override bool Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options
+    )
     {
-        if (reader.TokenType != JsonTokenType.String)
-            throw new JsonException("Expected a string value.");
-
-        string value = reader.GetString();
-        return value == "1";
+        string? value = reader.GetString();
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+        return value.ToLower() == "true" || value == "1";
     }
 
     public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value ? "1" : "0");
+        writer.WriteBooleanValue(value);
     }
 }

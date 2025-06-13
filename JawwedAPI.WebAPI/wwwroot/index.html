@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>JawwedAPI – Google Sign‑In & FCM Test</title>
+    <title>JawwedAPI – Google Sign‑In & FCM Test</title>
 
     <!-- 1) Firebase App + Messaging (modular SDK) -->
     <script type="module">
@@ -16,27 +16,26 @@
 
       // Your Firebase config
       const firebaseConfig = {
-        apiKey: "AIzaSyBbjNlOAgXxIXry6oZD5n-OfafQg6z3fWw",
+        apiKey: "AIzaSyB7YzM_OQ0Uq_aEyz5Yn3rgQ6NWdz7lxfU",
         authDomain: "jawwedapi-2cfdf.firebaseapp.com",
         projectId: "jawwedapi-2cfdf",
-        storageBucket: "jawwedapi-2cfdf.appspot.com",
+        storageBucket: "jawwedapi-2cfdf.firebasestorage.app",
         messagingSenderId: "151202375322",
-        appId: "1:151202375322:web:44f83f842a6c051efce123",
-        measurementId: "G-B2NSFY1Y5Y",
+        appId: "1:151202375322:web:6586a77d24525a0ffce123",
+        measurementId: "G-YP691M6Q0W"
       };
 
       // Init
       const app = initializeApp(firebaseConfig);
       const messaging = getMessaging(app);
 
-      const VAPID_KEY =
-        "BDKj2Dvd36Hee8FlqJq52wp4suc0IikCSMMZRzzwZE6iAHkLfJzwdAgJIJs6OmBqiwuYb4hv2aRWK-rlqWealqM";
+      const VAPID_KEY = "BDhOVa1zKQEs0heQmuu-laIv6rz6GPg1exivQlNgSl4jeDO9E8NZV5sk4TK8RdRf74HZRysMEDBgKVN6sGk3OrU";
 
       // Register service worker
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .register("/firebase-messaging-sw.js")
-          .then(() => console.log("FCM SW registered"))
+          .then(() => console.log("FCM SW registered"))
           .catch(console.error);
       }
 
@@ -176,7 +175,7 @@
   </head>
 
   <body>
-    <h1>JawwedAPI – Google Sign‑In & FCM Test</h1>
+    <h1>JawwedAPI – Google Sign‑In & FCM Test</h1>
 
     <!-- Google Sign‑In -->
     <div id="g_id_onload"></div>

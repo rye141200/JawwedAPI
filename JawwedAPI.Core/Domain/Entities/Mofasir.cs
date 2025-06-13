@@ -9,12 +9,12 @@ public class Mofasir
     public int MofasirID { get; set; }
 
     // Book name in both languages
-    public string? BookNameArabic { get; set; }
-    public string? BookNameEnglish { get; set; }
+    public required string BookNameArabic { get; set; }
+    public required string BookNameEnglish { get; set; }
 
     // Author name in both languages
-    public string? AuthorNameArabic { get; set; }
-    public string? AuthorNameEnglish { get; set; }
+    public required string AuthorNameArabic { get; set; }
+    public required string AuthorNameEnglish { get; set; }
 
     // Language support flags
     public bool SupportsArabic { get; set; } = true;

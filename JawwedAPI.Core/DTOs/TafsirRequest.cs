@@ -16,19 +16,19 @@ public class TafsirRequest
     /// The name or identifier of the mofasir (scholar/interpreter) whose tafsir is being requested.
     /// </summary>
     /// <example>ibn-kathir, tabari, qurtubi</example>
-    public string? mofasirID { get; set; }
+    public required string MofasirID { get; set; }
 
     /// <summary>
     /// The chapter number when requesting chapter tafsir,
     /// or the chapter:verse format (e.g. "1:1") when requesting a specific verse tafsir.
     /// </summary>
     /// <example>"1" for chapter 1, or "1:1" for chapter 1, verse 1</example>
-    public string? chapter { get; set; }
+    public required string Chapter { get; set; }
 
     /// <summary>
     /// The language in which to return the tafsir content.
     /// Defaults to Arabic if not specified.
     /// </summary>
     /// <example>العربية, English, Français</example>
-    public string? language { get; set; } = "العربية";
+    public string? Language { get; set; } = "العربية";
 }

@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using Hangfire;
 using JawwedAPI.Core.Jobs;
+using JawwedAPI.Core.Services;
 using JawwedAPI.WebAPI.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
-using Scalar.AspNetCore;
 using Scalar.AspNetCore;
 
 namespace JawwedAPI.WebAPI;
@@ -26,9 +26,10 @@ public class Program
             .AddCorsPolicy()
             .AddCacheServices(builder.Configuration);
 
+        builder.Services.AddScoped<PushNotificationJob>();
+
         builder.Services.AddServices(builder.Configuration);
 
-        builder.Services.AddOpenApi();
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
@@ -68,11 +69,6 @@ public class Program
         app.Map("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
         // app.MapGet("/", async () => await app.SeedData());
         app.UseHangfireDashboard("/Hangfire");
-        RecurringJob.AddOrUpdate<PushNotificationJob>(
-            "DailyReadingNotifications",
-            svc => svc.CheckAndNotifyAllUsersAsync(CancellationToken.None),
-            Cron.Daily
-        );
         app.Run();
     }
 }

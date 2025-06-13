@@ -29,7 +29,7 @@ public class Verse
     public bool? Sajdah { get; set; }
 
     [Required]
-    public string? TextUthmani { get; set; }
+    public required string TextUthmani { get; set; }
 
     //! Foreign => Chapter
     [ForeignKey("Chapter")]

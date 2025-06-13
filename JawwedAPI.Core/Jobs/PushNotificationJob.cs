@@ -1,182 +1,306 @@
 using FirebaseAdmin.Messaging;
 using Hangfire;
+using Hangfire.Storage;
 using JawwedAPI.Core.Domain.Entities;
 using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.DTOs;
+using JawwedAPI.Core.Exceptions.CustomExceptions;
 using JawwedAPI.Core.ServiceInterfaces.NotificationInterfaces;
-using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using Microsoft.Extensions.Logging;
+using TimeZoneConverter;
 
 namespace JawwedAPI.Core.Jobs
 {
     public class PushNotificationJob(
-        IGoalsService goalsService,
         INotificationService notifier,
         IGenericRepository<ApplicationUser> users,
+        IGenericRepository<Goal> goals,
         ILogger<PushNotificationJob> log
     )
     {
-        // Called once a day by Hangfire
-        public async Task CheckAndNotifyAllUsersAsync(CancellationToken _ = default)
+        // Called when a goal is created or updated
+        public async Task ScheduleNotificationsForGoalAsync(
+            Guid userId,
+            Guid goalId,
+            CancellationToken _ = default
+        )
         {
-            log.LogInformation("Starting daily notification check for all users");
-
-            var subs = await users.Find(users =>
-                users.EnableNotifications && !string.IsNullOrWhiteSpace(users.DeviceToken)
+            log.LogInformation(
+                "Scheduling notifications for goal {GoalId} for user {UserId}",
+                goalId,
+                userId
             );
-            log.LogInformation("Found {UserCount} users with notifications enabled", subs.Count());
 
-            foreach (var user in subs)
-            {
-                log.LogDebug("Processing notifications for user {UserId}", user.UserId);
+            ApplicationUser? user = await users.FindOne(u =>
+                u.UserId == userId
+                && u.EnableNotifications
+                && !string.IsNullOrWhiteSpace(u.DeviceToken)
+            );
 
-                var goals = (await goalsService.GetAllUserGoalsAsync(user.UserId)).Where(g =>
-                    g.Status == GoalStatus.InProgress.ToString()
+            if (user == null)
+                throw new GlobalErrorThrower(
+                    404,
+                    "User Not Found or Notifications Disabled",
+                    "User not found or notifications are not enabled. Please register your device and enable notifications."
                 );
 
-                log.LogDebug("User {UserId} has {GoalCount} goals", user.UserId, goals.Count());
-                foreach (var goal in goals)
-                {
-                    log.LogDebug(
-                        "Processing goal {GoalId} for user {UserId}",
-                        goal.GoalId,
-                        user.UserId
-                    );
+            Goal? goal = await goals.FindOne(g => g.GoalId == goalId && g.UserId == userId);
 
-                    await SendMissedDaysAsync(user.DeviceToken!, goal);
-                    ScheduleInProgressReminders(user.UserId, user.DeviceToken!, goal);
+            if (goal == null)
+                throw new GlobalErrorThrower(
+                    404,
+                    "Goal Not Found",
+                    "The specified goal was not found for this user."
+                );
+
+            if (goal.Status != GoalStatus.InProgress)
+            {
+                log.LogDebug(
+                    "Goal {GoalId} is not in progress, skipping notification scheduling",
+                    goalId
+                );
+                return;
+            }
+
+            // Create a unique job key for this goal
+            string jobKey = $"{userId:N}-{goalId:N}";
+
+            // Delete any existing job with the same key
+            var monitoring = JobStorage.Current.GetMonitoringApi();
+            var scheduled = monitoring.ScheduledJobs(0, int.MaxValue);
+            var conn = JobStorage.Current.GetConnection();
+
+            // Clean up any existing jobs with old signature
+            foreach (var kv in scheduled)
+            {
+                string? existingJobKey = conn.GetJobParameter(kv.Key, "JobKey");
+                if (existingJobKey == jobKey)
+                {
+                    BackgroundJob.Delete(kv.Key);
+                    log.LogDebug("Deleted existing job {JobId} with key {JobKey}", kv.Key, jobKey);
+                }
+            }
+
+            // Also clean up any recurring jobs with old signature
+            var recurringJobs = JobStorage.Current.GetConnection().GetRecurringJobs();
+            foreach (var job in recurringJobs)
+            {
+                if (job.Id.StartsWith(jobKey))
+                {
+                    RecurringJob.RemoveIfExists(job.Id);
+                    log.LogDebug("Deleted recurring job {JobKey}", job.Id);
+                }
+            }
+
+            // Schedule the recurring job to run daily at the specified reminder time
+            Message msg = new()
+            {
+                Token = user.DeviceToken!,
+                Notification = new Notification
+                {
+                    Title = goal.Title,
+                    Body = $"حان الوقت لقراة وردك اليومي من تحدي {goal.Title}",
+                },
+            };
+
+            // Calculate end date for notifications (in UTC)
+            var endDate = DateTime.UtcNow.AddDays(goal.DurationDays);
+
+            // Create a DateTimeOffset from the reminder time and convert to UTC
+            var reminderTime = new DateTimeOffset(
+                DateTime.Today.Add(goal.ReminderTime),
+                DateTimeOffset.Now.Offset
+            ).ToUniversalTime();
+
+            // Schedule the job to run daily at exactly the specified time
+            RecurringJob.AddOrUpdate(
+                jobKey,
+                () =>
+                    SendNotification(
+                        user.DeviceToken!,
+                        goal.Title,
+                        $"حان الوقت لقراة وردك اليومي من تحدي {goal.Title}"
+                    ),
+                Cron.Daily(reminderTime.Hour, reminderTime.Minute)
+            );
+
+            // Schedule job to check and update goal status after duration
+            string statusCheckJobKey = $"{jobKey}-status-check";
+            var client = new BackgroundJobClient();
+            client.Schedule(
+                () => CheckAndUpdateGoalStatusAsync(userId, goalId),
+                endDate - DateTime.UtcNow
+            );
+
+            log.LogInformation(
+                "Scheduled daily reminder job with key {JobKey} for goal {GoalId} at {Hours}:{Minutes} until {EndDate}",
+                jobKey,
+                goalId,
+                reminderTime.Hour,
+                reminderTime.Minute,
+                endDate
+            );
+        }
+
+        // Called when a goal is completed or deleted
+        public async Task DeleteScheduledNotificationsAsync(
+            Guid userId,
+            Guid goalId,
+            CancellationToken _ = default
+        )
+        {
+            log.LogInformation(
+                "Deleting scheduled notifications for goal {GoalId} for user {UserId}",
+                goalId,
+                userId
+            );
+
+            string jobKey = $"{userId:N}-{goalId:N}";
+            string cleanupJobKey = $"{jobKey}-cleanup";
+
+            // Delete the recurring notification job
+            await Task.Run(() => RecurringJob.RemoveIfExists(jobKey));
+            log.LogInformation("Removed recurring job {JobKey}", jobKey);
+
+            // Get all scheduled jobs
+            var monitoring = JobStorage.Current.GetMonitoringApi();
+            var scheduled = monitoring.ScheduledJobs(0, int.MaxValue);
+            var conn = JobStorage.Current.GetConnection();
+
+            // Delete any scheduled jobs that match our job key pattern
+            foreach (var kv in scheduled)
+            {
+                string? existingJobKey = conn.GetJobParameter(kv.Key, "JobKey");
+                if (existingJobKey?.StartsWith(jobKey) == true)
+                {
+                    BackgroundJob.Delete(kv.Key);
+                    log.LogInformation(
+                        "Deleted scheduled job {JobId} with key {JobKey}",
+                        kv.Key,
+                        existingJobKey
+                    );
+                }
+            }
+
+            // Also check and delete any completed session jobs
+            var recurringJobs = JobStorage.Current.GetConnection().GetRecurringJobs();
+            foreach (var job in recurringJobs)
+            {
+                if (job.Id.StartsWith(jobKey))
+                {
+                    RecurringJob.RemoveIfExists(job.Id);
+                    log.LogInformation("Deleted recurring job {JobKey}", job.Id);
                 }
             }
         }
 
-        private async Task SendMissedDaysAsync(string token, GoalResponse goal)
+        // Method to send notification - used by Hangfire
+        [AutomaticRetry(Attempts = 3)]
+        public async Task SendNotification(string token, string title, string body)
         {
-            log.LogDebug("Checking missed days for goal {GoalId}", goal.GoalId);
-
-            var missed = goal
-                .ReadingSchedule.Where(session =>
-                    session.Status == ReadingSessionStatus.Missed.ToString()
-                )
-                .Select(session => session.DayNumber)
-                .ToList();
-            if (!missed.Any())
+            try
             {
-                log.LogDebug("No missed days found for goal {GoalId}", goal.GoalId);
-                return;
-            }
-
-            log.LogInformation(
-                "Sending missed days notification for goal {GoalId}. Missed days: {MissedDays}",
-                goal.GoalId,
-                string.Join(", ", missed)
-            );
-
-            Message mssage = new Message
-            {
-                Token = token,
-                Notification = new Notification()
+                var message = new Message
                 {
-                    Title = $"Missed Days {goal.Title}",
-                    Body = $"You’ve missed days: {string.Join(", ", missed)}",
-                },
-            };
-            await notifier.SendAsync(mssage);
-            log.LogDebug(
-                "Successfully sent missed days notification for goal {GoalId}",
-                goal.GoalId
-            );
+                    Token = token,
+                    Notification = new Notification { Title = title, Body = body },
+                };
+                await notifier.SendAsync(message);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Failed to send notification");
+                throw new GlobalErrorThrower(
+                    500,
+                    "Notification Send Failed",
+                    "Failed to send notification. Please try again later."
+                );
+            }
         }
 
-        private void ScheduleInProgressReminders(Guid userId, string token, GoalResponse goal)
+        // Method to remove recurring job - used by Hangfire
+        public Task RemoveRecurringJob(string jobKey)
         {
-            log.LogDebug("Checking in-progress sessions for goal {GoalId}", goal.GoalId);
-            var inProgressSessions = goal
-                .ReadingSchedule.Where(s => s.Status == ReadingSessionStatus.InProgress.ToString())
-                .ToList();
-
-            if (!inProgressSessions.Any())
+            try
             {
-                log.LogDebug("No in-progress sessions found for goal {GoalId}", goal.GoalId);
+                RecurringJob.RemoveIfExists(jobKey);
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Failed to remove recurring job {JobKey}", jobKey);
+                throw new GlobalErrorThrower(
+                    500,
+                    "Job Removal Failed",
+                    "Failed to remove scheduled notification. Please try again later."
+                );
+            }
+        }
+
+        // Called when a goal's duration ends or when checking goal status
+        public async Task CheckAndUpdateGoalStatusAsync(Guid userId, Guid goalId)
+        {
+            log.LogInformation(
+                "Checking goal status for goal {GoalId} for user {UserId}",
+                goalId,
+                userId
+            );
+
+            var goal = await goals.FindOne(g => g.GoalId == goalId && g.UserId == userId);
+            if (goal == null)
+            {
+                log.LogWarning("Goal {GoalId} not found for user {UserId}", goalId, userId);
                 return;
             }
 
-            log.LogInformation(
-                "Scheduling reminders for {Count} in-progress sessions for goal {GoalId}",
-                inProgressSessions.Count,
-                goal.GoalId
-            );
-
-            foreach (var session in inProgressSessions)
+            // If goal is completed, delete all related jobs
+            if (goal.Status == GoalStatus.Completed)
             {
-                log.LogDebug(
-                    "Scheduling morning reminder for day {DayNumber}, goal {GoalId}",
-                    session.DayNumber,
-                    goal.GoalId
-                );
-                ScheduleAt(
-                    userId,
-                    token,
-                    $"Time to catch up {goal.Title}",
-                    $"Day {session.DayNumber} is in progress.",
-                    goal.GoalId,
-                    session.DayNumber,
-                    session.ScheduledDate, // pass through the date you already have
-                    goal.ReminderTime // TimeSpan exactly as the user specified
+                string jobKey = $"{userId:N}-{goalId:N}";
+                string statusCheckJobKey = $"{jobKey}-status-check";
+
+                // Delete the recurring notification job
+                RecurringJob.RemoveIfExists(jobKey);
+                log.LogInformation("Removed recurring job {JobKey} for completed goal", jobKey);
+
+                // Get all scheduled jobs
+                var monitoring = JobStorage.Current.GetMonitoringApi();
+                var scheduled = monitoring.ScheduledJobs(0, int.MaxValue);
+                var conn = JobStorage.Current.GetConnection();
+
+                // Delete any scheduled jobs that match our job key pattern
+                foreach (var kv in scheduled)
+                {
+                    string? existingJobKey = conn.GetJobParameter(kv.Key, "JobKey");
+                    if (existingJobKey?.StartsWith(jobKey) == true)
+                    {
+                        BackgroundJob.Delete(kv.Key);
+                        log.LogInformation(
+                            "Deleted scheduled job {JobId} with key {JobKey}",
+                            kv.Key,
+                            existingJobKey
+                        );
+                    }
+                }
+
+                return;
+            }
+
+            // Calculate end date
+            var endDate = goal.StartDate.AddDays(goal.DurationDays);
+
+            // If goal is still in progress and duration has ended
+            if (goal.Status == GoalStatus.InProgress && DateTimeOffset.UtcNow >= endDate)
+            {
+                goal.Status = GoalStatus.Canceled;
+                goals.Update(goal);
+                await goals.SaveChangesAsync();
+                log.LogInformation(
+                    "Updated goal {GoalId} status to Canceled as duration has ended",
+                    goalId
                 );
             }
-        }
-
-        private void ScheduleAt(
-            Guid userId,
-            string token,
-            string title,
-            string body,
-            Guid goalId,
-            int dayNumber,
-            DateTime sessionDate, // your date (no time part)
-            TimeSpan reminderTime // your TimeSpan-only reminder time
-        )
-        {
-            // 1) Build a local DateTime for sessionDate at reminderTime
-            var localDateTime = DateTime.SpecifyKind(
-                sessionDate.Date.Add(reminderTime),
-                DateTimeKind.Local
-            );
-
-            // 2) Convert that local time to UTC
-            var fireUtc = localDateTime.ToUniversalTime();
-
-            // 3) If it’s already past, run in 1 minute
-            var nowUtc = DateTime.UtcNow;
-            if (fireUtc <= nowUtc)
-                fireUtc = nowUtc.AddMinutes(1);
-
-            // 4) Compute delay
-            var delay = fireUtc - nowUtc;
-
-            // 5) Schedule the one‐off job
-            var msg = new Message
-            {
-                Token = token,
-                Notification = new Notification { Title = title, Body = body },
-            };
-            string jobId = BackgroundJob.Schedule<INotificationService>(
-                svc => svc.SendAsync(msg),
-                delay
-            );
-
-            // 6) Stamp your unique JobKey
-            var jobKey = $"{userId:N}-{goalId:N}-day{dayNumber}";
-            JobStorage.Current.GetConnection().SetJobParameter(jobId, "JobKey", jobKey);
-
-            log.LogDebug(
-                "Scheduled job {JobId} to fire at {FireUtc:O} (delay {Delay}) key={JobKey}",
-                jobId,
-                fireUtc,
-                delay,
-                jobKey
-            );
         }
     }
 }

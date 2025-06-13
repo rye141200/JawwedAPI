@@ -3,9 +3,9 @@ using JawwedAPI.Core.DTOs;
 public class GoalResponse
 {
     public Guid GoalId { get; set; }
-    public string Title { get; init; }
-    public DateTime StartDate { get; init; }
-    public DateTime EndDate => StartDate.AddDays(DurationDays);
+    public required string Title { get; init; }
+    public DateTimeOffset StartDate { get; init; }
+    public DateTimeOffset EndDate => StartDate.AddDays(DurationDays);
     public string PageRange => $"{StartPage} - {EndPage}";
     public int TotalPages { get; init; }
     public int DurationDays { get; set; }
@@ -14,9 +14,8 @@ public class GoalResponse
     public int StartPage { get; init; }
     public int EndPage => StartPage + TotalPages - 1;
     public string LastVerseKeyRead { get; set; } = string.Empty;
-    public string Status { get; set; }
+    public required string Status { get; set; }
     public TimeSpan ReminderTime { get; set; }
 
-    public List<ReadingSessionResponse> ReadingSchedule { get; set; } =
-        new List<ReadingSessionResponse>();
+    public List<ReadingSessionResponse> ReadingSchedule { get; set; } = [];
 }

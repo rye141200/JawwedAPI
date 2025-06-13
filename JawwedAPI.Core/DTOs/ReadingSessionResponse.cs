@@ -21,7 +21,7 @@ public class ReadingSessionResponse
     /// <summary>
     /// Date when this reading session is scheduled to occur
     /// </summary>
-    public DateTime ScheduledDate { get; set; }
+    public DateTimeOffset ScheduledDate { get; set; }
 
     /// <summary>
     /// First Quran page to read in this session

@@ -155,8 +155,8 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<TimeSpan>("ReminderTime")
                         .HasColumnType("time");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("StartPage")
                         .HasColumnType("int");
@@ -235,9 +235,11 @@ namespace JawwedAPI.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MofasirID"));
 
                     b.Property<string>("AuthorNameArabic")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AuthorNameEnglish")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BiographyArabic")
@@ -250,9 +252,11 @@ namespace JawwedAPI.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BookNameArabic")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BookNameEnglish")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DeathYear")

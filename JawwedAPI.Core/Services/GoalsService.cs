@@ -4,17 +4,25 @@ using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.Exceptions.CustomExceptions;
+using JawwedAPI.Core.Jobs;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 
 namespace JawwedAPI.Core.Services;
 
-public class GoalsService(IMapper mapper, IGenericRepository<Goal> goalRepository) : IGoalsService
+public class GoalsService(
+    IMapper mapper,
+    IGenericRepository<Goal> goalRepository,
+    PushNotificationJob notificationJob
+) : IGoalsService
 {
     public async Task CreateGoalAsync(CreateGoalRequest request)
     {
         Goal goal = mapper.Map<Goal>(request);
+        //! 2) create the goal
         await goalRepository.Create(goal);
         await goalRepository.SaveChangesAsync();
+        //!  1)Schedule notifications for the new goal
+        await notificationJob.ScheduleNotificationsForGoalAsync(request.UserId!.Value, goal.GoalId);
     }
 
     public async Task<GoalResponse> GetGoalByIdAsync(Guid goalId, Guid userId)
@@ -49,7 +57,11 @@ public class GoalsService(IMapper mapper, IGenericRepository<Goal> goalRepositor
         goal.ActualPagesRead = totalPagesRead;
         goal.LastVerseKeyRead = request.LastVerseKeyRead;
         if (goal.ActualPagesRead == goal.TotalPages)
+        {
             goal.Status = GoalStatus.Completed;
+            // Check and clean up jobs for completed goal
+            await notificationJob.CheckAndUpdateGoalStatusAsync(userId, goalId);
+        }
         await goalRepository.SaveChangesAsync();
         return mapper.Map<GoalResponse>(goal);
     }
@@ -64,5 +76,8 @@ public class GoalsService(IMapper mapper, IGenericRepository<Goal> goalRepositor
         goal.Status = GoalStatus.Canceled;
         goalRepository.Update(goal);
         await goalRepository.SaveChangesAsync();
+
+        // Delete scheduled notifications for this goal
+        await notificationJob.DeleteScheduledNotificationsAsync(userId, goalId);
     }
 }

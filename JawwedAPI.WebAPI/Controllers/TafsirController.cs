@@ -1,7 +1,5 @@
-
 using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace JawwedAPI.WebAPI.Controllers
@@ -24,9 +22,10 @@ namespace JawwedAPI.WebAPI.Controllers
         {
             // Get all tafsir entries for the specified chapter
             List<TafsirResponse> tafsirs = await tafsirService.GetChapterTafsir(
-                tafsirRequest.mofasirID,
-                tafsirRequest.chapter,
-                tafsirRequest.language);
+                tafsirRequest.MofasirID,
+                tafsirRequest.Chapter,
+                tafsirRequest.Language
+            );
 
             return Ok(tafsirs);
         }
@@ -41,9 +40,10 @@ namespace JawwedAPI.WebAPI.Controllers
         {
             // Get tafsir entry for the specified verse
             TafsirResponse tafsir = await tafsirService.GetVerseTafsir(
-                tafsirRequest.mofasirID,
-                tafsirRequest.chapter,
-                tafsirRequest.language);
+                tafsirRequest.MofasirID,
+                tafsirRequest.Chapter,
+                tafsirRequest.Language
+            );
 
             return Ok(tafsir);
         }

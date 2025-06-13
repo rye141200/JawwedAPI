@@ -11,7 +11,7 @@ public class Goal
     public Guid GoalId { get; set; } = Guid.NewGuid();
     public Guid UserId { get; set; }
     public string Title { get; set; } = "Quran Khatma"; // Default title
-    public DateTime StartDate { get; set; } = DateTime.UtcNow.Date;
+    public DateTimeOffset StartDate { get; set; } = DateTimeOffset.UtcNow.Date;
     public int DurationDays { get; set; } = 30;
 
     [Range(1, 604, ErrorMessage = "This number of pages is not correct please choose another one")]
@@ -26,5 +26,5 @@ public class Goal
 
     //! navigational property
     [ForeignKey(nameof(UserId))]
-    public ApplicationUser User { get; set; }
+    public required ApplicationUser User { get; set; }
 }
