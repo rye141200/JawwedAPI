@@ -60,11 +60,16 @@ public class QuizController(
                 new
                 {
                     message = "Congrats for getting premium, well done and enjoy memorizing The Holy Quran 💖",
+                    passed = false,
                 }
             );
         }
         return Ok(
-            new { message = "You did not make it this time, try harder next time and good luck!" }
+            new
+            {
+                message = "You did not make it this time, try harder next time and good luck!",
+                passed = false,
+            }
         );
     }
 
