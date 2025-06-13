@@ -83,12 +83,12 @@ public class FcmNotificationService(
         if (user == null)
             throw new GlobalErrorThrower(404, "User Not Found", "User not found");
 
-        if (string.IsNullOrEmpty(user.DeviceToken))
-            throw new GlobalErrorThrower(
-                400,
-                "Device Not Registered",
-                "Please register your device first"
-            );
+        // if (string.IsNullOrEmpty(user.DeviceToken))
+        //     throw new GlobalErrorThrower(
+        //         400,
+        //         "Device Not Registered",
+        //         "Please register your device first"
+        //     );
 
         user.DeviceToken = deviceToken;
         user.EnableNotifications = true;

@@ -22,14 +22,15 @@
         storageBucket: "jawwedapi-2cfdf.firebasestorage.app",
         messagingSenderId: "151202375322",
         appId: "1:151202375322:web:6586a77d24525a0ffce123",
-        measurementId: "G-YP691M6Q0W"
+        measurementId: "G-YP691M6Q0W",
       };
 
       // Init
       const app = initializeApp(firebaseConfig);
       const messaging = getMessaging(app);
 
-      const VAPID_KEY = "BDhOVa1zKQEs0heQmuu-laIv6rz6GPg1exivQlNgSl4jeDO9E8NZV5sk4TK8RdRf74HZRysMEDBgKVN6sGk3OrU";
+      const VAPID_KEY =
+        "BDhOVa1zKQEs0heQmuu-laIv6rz6GPg1exivQlNgSl4jeDO9E8NZV5sk4TK8RdRf74HZRysMEDBgKVN6sGk3OrU";
 
       // Register service worker
       if ("serviceWorker" in navigator) {
