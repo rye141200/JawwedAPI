@@ -33,7 +33,17 @@ public class GenericRepositoryMapped<T, M>(ApplicationDbContext context, IMapper
         );
 
     public async Task<IEnumerable<M>> GetAllMappedPopulated(
-        Expression<Func<T, object>> includeExpression
-    ) =>
-        mapper.Map<IEnumerable<M>>(await context.Set<T>().Include(includeExpression).ToListAsync());
+        Expression<Func<T, bool>> filter,
+        params Expression<Func<T, object>>[] includes
+    )
+    {
+        IQueryable<T> query = context.Set<T>();
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return mapper.Map<IEnumerable<M>>(await query.Where(filter).ToListAsync());
+    }
 }

@@ -79,17 +79,9 @@ public class FcmNotificationService(
 
     public async Task RegisterDeviceAsync(Guid userId, string deviceToken)
     {
-        var user = await userRepository.FindOne(u => u.UserId == userId);
-        if (user == null)
-            throw new GlobalErrorThrower(404, "User Not Found", "User not found");
-
-        if (string.IsNullOrEmpty(user.DeviceToken))
-            throw new GlobalErrorThrower(
-                400,
-                "Device Not Registered",
-                "Please register your device first"
-            );
-
+        var user =
+            await userRepository.FindOne(u => u.UserId == userId)
+            ?? throw new GlobalErrorThrower(404, "User Not Found", "User not found");
         user.DeviceToken = deviceToken;
         user.EnableNotifications = true;
         userRepository.Update(user);
@@ -100,10 +92,9 @@ public class FcmNotificationService(
 
     public async Task ToggleNotificationsAsync(Guid userId, bool enable)
     {
-        var user = await userRepository.FindOne(u => u.UserId == userId);
-        if (user == null)
-            throw new GlobalErrorThrower(404, "User Not Found", "User not found");
-
+        var user =
+            await userRepository.FindOne(u => u.UserId == userId)
+            ?? throw new GlobalErrorThrower(404, "User Not Found", "User not found");
         if (string.IsNullOrEmpty(user.DeviceToken))
             throw new GlobalErrorThrower(
                 400,
@@ -129,10 +120,9 @@ public class FcmNotificationService(
         DateTime? scheduledTime = null
     )
     {
-        var user = await userRepository.FindOne(u => u.UserId == userId);
-        if (user == null)
-            throw new GlobalErrorThrower(404, "User Not Found", "User not found");
-
+        var user =
+            await userRepository.FindOne(u => u.UserId == userId)
+            ?? throw new GlobalErrorThrower(404, "User Not Found", "User not found");
         if (string.IsNullOrEmpty(user.DeviceToken))
             throw new GlobalErrorThrower(
                 400,
@@ -172,10 +162,9 @@ public class FcmNotificationService(
 
     public async Task DeleteNotificationAsync(Guid userId, Guid notificationId)
     {
-        var user = await userRepository.FindOne(u => u.UserId == userId);
-        if (user == null)
-            throw new GlobalErrorThrower(404, "User Not Found", "User not found");
-
+        var user =
+            await userRepository.FindOne(u => u.UserId == userId)
+            ?? throw new GlobalErrorThrower(404, "User Not Found", "User not found");
         var monitoring = JobStorage.Current.GetMonitoringApi();
         var scheduled = await Task.Run(() => monitoring.ScheduledJobs(0, int.MaxValue));
         var conn = JobStorage.Current.GetConnection();

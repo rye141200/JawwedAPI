@@ -1,3 +1,4 @@
+using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.DTOs;
 
 namespace JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
@@ -26,5 +27,5 @@ public interface IBookmarkServices
     /// <param name="userId"></param>
     /// <param name="verseKey"></param>
     /// <returns></returns>
-    Task<bool> DeleteBookmark(Guid userId, string verseKey);
+    public Task<bool> DeleteBookmark(Guid userId, string identifier, BookmarkType type);
 }

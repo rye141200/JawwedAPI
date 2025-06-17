@@ -1,6 +1,7 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using JawwedAPI.Core.Domain.Entities;
+using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -41,13 +42,13 @@ public class BookmarkController(IBookmarkServices bookmarkService) : CustomBaseC
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteBookmark(string verseKey)
+    public async Task<IActionResult> DeleteBookmark(string identifier, BookmarkType type)
     {
         Guid? userID = GetUserID();
         if (userID == null)
             return NotFound("User ID does not exist!");
 
-        await bookmarkService.DeleteBookmark(userID.Value, verseKey);
+        await bookmarkService.DeleteBookmark(userID.Value, identifier, type);
         return Ok();
     }
 

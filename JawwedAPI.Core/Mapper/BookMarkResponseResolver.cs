@@ -28,9 +28,12 @@ public class BookMarkResponseResolver(IOptions<AudioAssetsOptions> audioOptions)
         ResolutionContext context
     )
     {
+        if (string.IsNullOrEmpty(source.VerseKey))
+            return [];
+
         string baselink = audioOptions.Value.AudioBaseLink;
         List<string> reciters = audioOptions.Value.Mashaykh;
-        List<string> audioLinks = new List<string>();
+        List<string> audioLinks = [];
 
         foreach (string reciter in reciters)
         {
@@ -43,10 +46,10 @@ public class BookMarkResponseResolver(IOptions<AudioAssetsOptions> audioOptions)
                 () => "mp3",
             ];
 
-            string[] verseParts = source
-                .VerseKey.Split(':')
-                .Select(part => int.Parse(part).ToString("D3"))
-                .ToArray();
+            string[] verseParts =
+            [
+                .. source.VerseKey.Split(':').Select(part => int.Parse(part).ToString("D3")),
+            ];
 
             predicates.Add(() => $"{verseParts[0]}{verseParts[1]}.mp3");
 

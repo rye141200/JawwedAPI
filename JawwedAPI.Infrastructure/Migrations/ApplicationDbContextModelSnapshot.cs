@@ -82,6 +82,9 @@ namespace JawwedAPI.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookmarkId"));
 
+                    b.Property<int>("BookmarkType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Page")
                         .HasColumnType("nvarchar(max)");
 
@@ -94,9 +97,14 @@ namespace JawwedAPI.Infrastructure.Migrations
                     b.Property<string>("VerseKey")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ZekrID")
+                        .HasColumnType("int");
+
                     b.HasKey("BookmarkId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("ZekrID");
 
                     b.ToTable("Bookmarks");
                 });
@@ -405,7 +413,13 @@ namespace JawwedAPI.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("JawwedAPI.Core.Domain.Entities.Zekr", "Zekr")
+                        .WithMany()
+                        .HasForeignKey("ZekrID");
+
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("Zekr");
                 });
 
             modelBuilder.Entity("JawwedAPI.Core.Domain.Entities.Goal", b =>

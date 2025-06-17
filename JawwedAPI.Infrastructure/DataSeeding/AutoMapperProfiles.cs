@@ -12,7 +12,13 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<BookmarkAddRequest, Bookmark>();
         CreateMap<Bookmark, BookmarkResponse>()
-            .ForMember(dest => dest.Audios, options => options.MapFrom<BookMarkResponseResolver>());
+            .ForMember(dest => dest.Audios, options => options.MapFrom<BookMarkResponseResolver>())
+            .ForMember(
+                dest => dest.BookmarkType,
+                opt =>
+                    opt.MapFrom(src => src.ZekrID.HasValue ? BookmarkType.Zekr : BookmarkType.Quran)
+            )
+            .ForMember(dest => dest.Zekr, opt => opt.MapFrom(src => src.Zekr));
 
         CreateMap<Line, LineResponse>()
             .ForMember(

@@ -1,17 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using JawwedAPI.Core.Domain.Enums;
 
 namespace JawwedAPI.Core.DTOs;
 
 public class BookmarkAddRequest
 {
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; } = Guid.Empty;
 
-    [Required]
-    public string VerseKey { get; set; } = null!;
+    public string? VerseKey { get; set; }
 
-    [Required]
-    public string Verse { get; set; } = null!;
+    public string? Verse { get; set; }
 
-    [Required]
-    public string Page { get; set; } = null!;
+    public string? Page { get; set; }
+
+    public BookmarkType BookmarkType { get; set; }
+
+    public int? ZekrID { get; set; }
 }

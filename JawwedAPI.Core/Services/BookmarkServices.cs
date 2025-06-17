@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using JawwedAPI.Core.Domain.Entities;
+using JawwedAPI.Core.Domain.Enums;
 using JawwedAPI.Core.Domain.RepositoryInterfaces;
 using JawwedAPI.Core.DTOs;
 using JawwedAPI.Core.Exceptions;
 using JawwedAPI.Core.Exceptions.CustomExceptions;
 using JawwedAPI.Core.ServiceInterfaces.QuranInterfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace JawwedAPI.Core.Services;
 
@@ -13,7 +15,9 @@ public class BookmarkServices(
     IGenericRepository<Bookmark> bookmarkRepository,
     IMapper mapper,
     IGenericRepositoryMapped<Bookmark, BookmarkResponse> bookmarkMapper,
-    IGenericRepository<ApplicationUser> userRepository
+    IGenericRepository<ApplicationUser> userRepository,
+    IGenericRepository<Zekr> zekrRepository,
+    IConfiguration configuration
 ) : IBookmarkServices
 {
     /// <summary>
@@ -25,7 +29,10 @@ public class BookmarkServices(
     public async Task<BookmarkResponse?> AddBookmark(BookmarkAddRequest bookmarkAddRequest)
     {
         //! 1) check if the data is correct
-        if (await userRepository.GetOne(bookmarkAddRequest.UserId) == null)
+        if (bookmarkAddRequest.UserId == null)
+            throw new GlobalErrorThrower(400, "Invalid Data", "UserId is required");
+
+        if (await userRepository.GetOne(bookmarkAddRequest.UserId.Value) == null)
             throw new GlobalErrorThrower(
                 404,
                 "Invalid Data",
@@ -33,11 +40,21 @@ public class BookmarkServices(
             );
 
         //! 2) check if the new bookmark already exists in the databse
-        Bookmark? existingBookmark = await bookmarkRepository.FindOne(bookmark =>
-            bookmark.UserId == bookmarkAddRequest.UserId
-            && bookmark.VerseKey == bookmarkAddRequest.VerseKey
-        );
-
+        Bookmark? existingBookmark = null;
+        if (bookmarkAddRequest.BookmarkType == BookmarkType.Quran)
+        {
+            existingBookmark = await bookmarkRepository.FindOne(bookmark =>
+                bookmark.UserId == bookmarkAddRequest.UserId
+                && bookmark.VerseKey == bookmarkAddRequest.VerseKey
+            );
+        }
+        else if (bookmarkAddRequest.BookmarkType == BookmarkType.Zekr)
+        {
+            existingBookmark = await bookmarkRepository.FindOne(bookmark =>
+                bookmark.UserId == bookmarkAddRequest.UserId
+                && bookmark.ZekrID == bookmarkAddRequest.ZekrID
+            );
+        }
         if (existingBookmark != null)
         {
             throw new GlobalErrorThrower(
@@ -46,54 +63,88 @@ public class BookmarkServices(
                 "The data you try to add already exists!"
             );
         }
-        //! 3) check if the verseKey is correct
-        string[] verseParts = bookmarkAddRequest.VerseKey.Split(':');
-        if (int.Parse(verseParts[0]) > 286 || int.Parse(verseParts[1]) > 114)
-            throw new GlobalErrorThrower(
-                400,
-                "Invalid Data",
-                $"The entered Value :{bookmarkAddRequest.VerseKey} is invalid"
-            );
+        //! 3) if the type of bookmark is Quran
+        if (bookmarkAddRequest.BookmarkType == BookmarkType.Quran)
+        {
+            //! 3.1) check if the verseKey is correct
+            if (string.IsNullOrEmpty(bookmarkAddRequest.VerseKey))
+                throw new GlobalErrorThrower(
+                    400,
+                    "Invalid Data",
+                    "VerseKey is required for Quran bookmarks"
+                );
 
-        //!  4) Create and save new bookmark
-        var bookmark = mapper.Map<Bookmark>(bookmarkAddRequest);
-        await bookmarkRepository.Create(bookmark);
-        await bookmarkRepository.SaveChangesAsync();
+            string[] verseParts = bookmarkAddRequest.VerseKey.Split(':');
+            if (int.Parse(verseParts[0]) > 286 || int.Parse(verseParts[1]) > 114)
+                throw new GlobalErrorThrower(
+                    400,
+                    "Invalid Data",
+                    $"The entered Value :{bookmarkAddRequest.VerseKey} is invalid"
+                );
 
-        return mapper.Map<BookmarkResponse>(bookmark);
+            //!  3.1) Create and save new bookmark
+            var bookmark = mapper.Map<Bookmark>(bookmarkAddRequest);
+            await bookmarkRepository.Create(bookmark);
+            await bookmarkRepository.SaveChangesAsync();
+            return mapper.Map<BookmarkResponse>(bookmark);
+        }
+        else if (bookmarkAddRequest.BookmarkType == BookmarkType.Zekr)
+        {
+            //! 4) if the type of bookmark is Zekr
+
+            //! 4.1) simple validation
+            if (bookmarkAddRequest.ZekrID == null)
+                throw new GlobalErrorThrower(
+                    400,
+                    "Invalid Data",
+                    "ZekrID is required for zekr bookmarks"
+                );
+            if (await zekrRepository.GetOne(bookmarkAddRequest.ZekrID!.Value) == null)
+                throw new GlobalErrorThrower(
+                    400,
+                    "Invalid Data",
+                    "Invalid zekr data please try again"
+                );
+            //! 4.2) create and save new bookmark
+            var bookmark = mapper.Map<Bookmark>(bookmarkAddRequest);
+            await bookmarkRepository.Create(bookmark);
+            await bookmarkRepository.SaveChangesAsync();
+            return mapper.Map<BookmarkResponse>(bookmark);
+        }
+        throw new GlobalErrorThrower(
+            500,
+            "Invalid BookmarkType",
+            "Please choose valid bookmark type"
+        );
     }
 
     /// <summary>
     /// Deletes a user's bookmark
     /// </summary>
     /// <param name="userId">The ID of the user</param>
-    /// <param name="verseKey">The verse key to remove</param>
-    public async Task<bool> DeleteBookmark(Guid userId, string verseKey)
+    /// <param name="identifier">The identifier of the bookmark</param>
+    /// <param name="type">The type of the bookmark</param>
+    /// <returns>True if the bookmark was deleted, false otherwise</returns>
+    /// <exception cref="GlobalErrorThrower">Thrown when the user or bookmark is not found</exception>
+    public async Task<bool> DeleteBookmark(Guid userId, string identifier, BookmarkType type)
     {
-        //! 1) check if the data is correct
         if (await userRepository.GetOne(userId) == null)
-            throw new GlobalErrorThrower(
-                404,
-                "Invalid Data",
-                $"The user ID :{userId} is not found"
-            );
+            throw new GlobalErrorThrower(404, "Invalid Data", $"User ID {userId} not found");
 
-        //! 2) check if the bookmark that will be deleted is already exists in the databse
-        Bookmark? bookmark = await bookmarkRepository.FindOne(bookmark =>
-            bookmark.UserId == userId && bookmark.VerseKey == verseKey
-        );
+        Bookmark? bookmark =
+            type switch
+            {
+                BookmarkType.Quran => await bookmarkRepository.FindOne(b =>
+                    b.UserId == userId && b.VerseKey == identifier
+                ),
+                BookmarkType.Zekr => await bookmarkRepository.FindOne(b =>
+                    b.UserId == userId && b.ZekrID == int.Parse(identifier)
+                ),
+                _ => throw new GlobalErrorThrower(400, "Invalid Type", "Invalid bookmark type"),
+            } ?? throw new GlobalErrorThrower(404, "Not Found", "Bookmark not found");
 
-        if (bookmark is null)
-            throw new GlobalErrorThrower(
-                404,
-                "Data not Found",
-                "This bookmark is not exists in your bookmark collection"
-            );
-
-        //! 3) delete the bookmark from the database
         bookmarkRepository.Delete(bookmark);
         await bookmarkRepository.SaveChangesAsync();
-
         return true;
     }
 
@@ -102,27 +153,27 @@ public class BookmarkServices(
     /// </summary>
     /// <param name="userId">The ID of the user</param>
     /// <returns>Collection of bookmark responses</returns>
+    /// <exception cref="GlobalErrorThrower">Thrown when the user is not found</exception>
     public async Task<IEnumerable<BookmarkResponse>> GetAllBookmarks(Guid userId)
     {
-        //! 1) check if the data is correct
-        if (userId == Guid.Empty)
-        {
-            throw new GlobalErrorThrower(
-                400,
-                "Invalid User ID",
-                $"The entered user Identity {userId} is invalid"
-            );
-        }
-        //! 2) check if the entered userId is exists
-        //todo check if the this user exists in the database
         if (await userRepository.GetOne(userId) == null)
-            throw new GlobalErrorThrower(
-                404,
-                "Invalid Data",
-                $"The user ID :{userId} is not found"
-            );
+            throw new GlobalErrorThrower(404, "Invalid Data", $"User ID {userId} not found");
 
-        //! 3) get all available bookmarks
-        return await bookmarkMapper.Find(bookmark => bookmark.UserId == userId);
+        return (
+                await bookmarkMapper.GetAllMappedPopulated(
+                    bookmark => bookmark.UserId == userId,
+                    bookmark => bookmark.Zekr!
+                )
+            ).Select(bookmarkresponse =>
+            {
+                if (bookmarkresponse.BookmarkType == BookmarkType.Quran)
+                    return bookmarkresponse;
+                string baselink = configuration["AudioAssets:AzkarAudioBaseLink"]!;
+                Zekr zekr = bookmarkresponse.Zekr!;
+                zekr.Audio = $"{baselink}/{zekr.Audio}";
+                zekr.CategoryAudio = $"{baselink}/{zekr.CategoryAudio}";
+                bookmarkresponse.Zekr = zekr;
+                return bookmarkresponse;
+            }) ?? [];
     }
 }
