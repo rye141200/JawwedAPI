@@ -14,7 +14,7 @@ const firebaseConfig = {
   storageBucket: "jawwedapi-2cfdf.firebasestorage.app",
   messagingSenderId: "151202375322",
   appId: "1:151202375322:web:6586a77d24525a0ffce123",
-  measurementId: "G-YP691M6Q0W"
+  measurementId: "G-YP691M6Q0W",
 };
 
 // 3) Initialize compat app & get messaging
