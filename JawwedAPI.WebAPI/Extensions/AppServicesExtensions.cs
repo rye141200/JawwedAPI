@@ -215,10 +215,10 @@ public static class AppServicesExtensions
                     );
                 }
 
-                if (projectId != "jawwedapi-2cfdf")
+                if (projectId != "jawwedapi-mobile")
                 {
                     throw new InvalidOperationException(
-                        $"Project ID mismatch. Expected 'jawwedapi-2cfdf' but found '{projectId}'."
+                        $"Project ID mismatch. Expected 'jawwedapi-mobile' but found '{projectId}'."
                     );
                 }
 
