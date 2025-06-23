@@ -35,10 +35,33 @@ public class GoalsService(
         return goalResponse;
     }
 
-    public async Task<List<GoalResponse>> GetAllUserGoalsAsync(Guid userId)
+    public async Task<List<GoalResponse>> GetAllUserGoalsAsync(
+        Guid userId,
+        string? status = "InProgress"
+    )
     {
-        IEnumerable<Goal> goals = await goalRepository.Find(u => u.UserId == userId);
+        IEnumerable<Goal> goals;
 
+        if (
+            string.IsNullOrWhiteSpace(status)
+            || status.Equals("InProgress", StringComparison.OrdinalIgnoreCase)
+        )
+            // Default behavior - get InProgress goals
+            goals = await goalRepository.Find(u =>
+                u.UserId == userId && u.Status == GoalStatus.InProgress
+            );
+        else if (status.Equals("All", StringComparison.OrdinalIgnoreCase))
+            // Get all goals regardless of status
+            goals = await goalRepository.Find(u => u.UserId == userId);
+        else if (Enum.TryParse<GoalStatus>(status, ignoreCase: true, out var goalStatus))
+            // Filter by specific status
+            goals = await goalRepository.Find(u => u.UserId == userId && u.Status == goalStatus);
+        else
+            throw new GlobalErrorThrower(
+                400,
+                "Invalid Status",
+                $"Status '{status}' is not valid. Valid values are: {string.Join(", ", Enum.GetNames<GoalStatus>())}, All"
+            );
         return goals.Select(mapper.Map<GoalResponse>).ToList();
     }
 

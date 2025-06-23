@@ -11,6 +11,6 @@ public interface IGoalsService
     Task<GoalResponse> UpdateGoalAsync(UpdateGoalRequest request, Guid goalId, Guid userId);
 
     Task<GoalResponse> GetGoalByIdAsync(Guid goalId, Guid userId);
-    Task<List<GoalResponse>> GetAllUserGoalsAsync(Guid userId);
+    Task<List<GoalResponse>> GetAllUserGoalsAsync(Guid userId, string? status);
     Task DeleteGoalAsync(Guid goalId, Guid userId);
 }

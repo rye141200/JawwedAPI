@@ -34,11 +34,11 @@ public class GoalsController(IGoalsService goalsService, INotificationService no
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllGoals()
+    public async Task<IActionResult> GetAllGoals([FromQuery] string? status = "InProgress")
     {
         string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        return Ok(await goalsService.GetAllUserGoalsAsync(Guid.Parse(userId)));
+        return Ok(await goalsService.GetAllUserGoalsAsync(Guid.Parse(userId), status));
     }
 
     [HttpPut("{goalId}")]
